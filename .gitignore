@@ -1,0 +1,13 @@
+Manifest.toml
+docs/src/_auto_generated_list_of_measures.md
+.ipynb_checkpoints
+*~
+#*
+.DS_Store
+sandbox/
+/docs/build/
+/docs/site/
+/docs/Manifest.toml
+/test/Manifest.toml
+.vscode
+/ext/\*julia\*
