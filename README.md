@@ -11,6 +11,9 @@ Measures (metrics) for statistics and machine learning.
 Powered by
 [StatisticalMeasuresBase.jl](https://github.com/JuliaAI/StatisticalMeasuresBase.jl).
 
+See [here](https://juliaai.github.io/StatisticalMeasures.jl/dev/) for in-depth
+documentation.
+
 ## Acknowledgements
 
 A substantial part of the StatisticalMeasures.jl codebase is adapted from
