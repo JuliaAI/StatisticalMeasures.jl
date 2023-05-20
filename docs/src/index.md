@@ -1,5 +1,13 @@
 ```@raw html
 <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<div style="font-size:1.4em;font-weight:bold;">
+  <a href="https://juliaai.github.io/StatisticalMeasures.jl/dev/_auto_generated_list_of_measures.html#aliases"
+    style="color: #9558B2;">List of measures</a>           &nbsp;|&nbsp;
+  <a href="Examples of Usage"
+    style="color: #389826;">Examples</a>
+</div>
+
 <span style="color: #9558B2;font-size:4.5em;">
 StatisticalMeasures.jl</span>
 <br>
@@ -7,12 +15,6 @@ StatisticalMeasures.jl</span>
 Measures (metrics) for statistics and machine learning</span>
 <br><br>
 ```
-
-### Quick links
-
-- [Index of measures and their aliases](@ref aliases)
-- [Examples of Usage](@ref)
-
 
 # Overview
 
