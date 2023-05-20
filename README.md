@@ -11,7 +11,7 @@ Measures (metrics) for statistics and machine learning.
 [List](https://juliaai.github.io/StatisticalMeasures.jl/dev/_auto_generated_list_of_measures.html#aliases) of provided measures and their aliases thereof.
 
 Powered by
-[StatisticalMeasuresBase.jl](https://github.com/JuliaAI/StatisticalMeasuresBase.jl).
+[StatisticalMeasuresBase.jl](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/).
 
 See [here](https://juliaai.github.io/StatisticalMeasures.jl/dev/) for in-depth
 documentation.

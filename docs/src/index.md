@@ -25,7 +25,7 @@ multi-target measures](@ref).
 
 Measures with parameters (e.g., the ``L^p`` loss) are realized as callable instances of a
 struct; [calling syntax](@ref calling) complies with the specification in
-[StatisticalMeasuresBase.jl](https://github.com/JuliaAI/StatisticalMeasuresBase.jl).
+[StatisticalMeasuresBase.jl](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/).
 
 
 In addition to the measures themselves, this package provides:
