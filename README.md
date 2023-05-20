@@ -2,7 +2,7 @@
 
 &#128679;
 
-Measures (metrics) for statistics and machine learning. 
+Measures (metrics) for statistics and machine learning.
 
 [![Build Status](https://github.com/JuliaAI/StatisticalMeasures.jl/workflows/CI/badge.svg)](https://github.com/JuliaAI/StatisticalMeasures.jl/actions)
 [![Coverage](https://codecov.io/gh/JuliaAI/StatisticalMeasures.jl/branch/master/graph/badge.svg)](https://codecov.io/github/JuliaAI/StatisticalMeasures.jl?branch=master)

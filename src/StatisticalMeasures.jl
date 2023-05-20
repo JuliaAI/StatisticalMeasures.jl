@@ -1,4 +1,4 @@
-module StatisticalMeasures
+module StatisticalMeasures 
 
 using Statistics
 using MacroTools
