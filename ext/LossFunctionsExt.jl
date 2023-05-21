@@ -31,6 +31,7 @@ loss(measure) = measure
 #     show(io, mime, loss(measure))
 # Base.show(io::IO, measure::LossFunctionType) = show(io, loss(measure))
 
+println("############### LOADED ###############")
 
 # # DISTANCE LOSS TYPE
 
