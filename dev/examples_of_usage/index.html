@@ -50,10 +50,10 @@ Random.seed!()
 y = rand(&quot;ABC&quot;, 1000) |&gt; categorical
 ŷ = rand(&quot;ABC&quot;, 1000) |&gt; categorical
 class_weights = Dict(&#39;A&#39; =&gt; 1, &#39;B&#39; =&gt;2, &#39;C&#39; =&gt; 10)
-MulticlassFScore(beta=0.5, average=MacroAvg())(ŷ, y,  class_weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1.4568102017432292</code></pre><pre><code class="language-julia hljs">MulticlassFScore(beta=0.5, average=NoAvg())(ŷ, y,  class_weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">LittleDict{CategoricalArrays.CategoricalValue{Char, UInt32}, Float64, Tuple{CategoricalArrays.CategoricalValue{Char, UInt32}, CategoricalArrays.CategoricalValue{Char, UInt32}, CategoricalArrays.CategoricalValue{Char, UInt32}}, Tuple{Float64, Float64, Float64}} with 3 entries:
-  &#39;A&#39; =&gt; 0.328624
-  &#39;B&#39; =&gt; 0.694526
-  &#39;C&#39; =&gt; 3.34728</code></pre><p>Unseen classes are tracked, when using <code>CategoricalArrays</code>, as here:</p><pre><code class="language-julia hljs"># find &#39;C&#39;-free indices
+MulticlassFScore(beta=0.5, average=MacroAvg())(ŷ, y,  class_weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1.4059078145731443</code></pre><pre><code class="language-julia hljs">MulticlassFScore(beta=0.5, average=NoAvg())(ŷ, y,  class_weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">LittleDict{CategoricalArrays.CategoricalValue{Char, UInt32}, Float64, Tuple{CategoricalArrays.CategoricalValue{Char, UInt32}, CategoricalArrays.CategoricalValue{Char, UInt32}, CategoricalArrays.CategoricalValue{Char, UInt32}}, Tuple{Float64, Float64, Float64}} with 3 entries:
+  &#39;A&#39; =&gt; 0.311953
+  &#39;B&#39; =&gt; 0.747875
+  &#39;C&#39; =&gt; 3.15789</code></pre><p>Unseen classes are tracked, when using <code>CategoricalArrays</code>, as here:</p><pre><code class="language-julia hljs"># find &#39;C&#39;-free indices
 mask = y .!= &#39;C&#39; .&amp;&amp; ŷ .!= &#39;C&#39;;
 # and remove:
 y = y[mask]
@@ -63,9 +63,9 @@ ŷ = ŷ[mask]
 ┌─────────────┼─────────────┬─────────────┬─────────────┤
 │  Predicted  │      A      │      B      │      C      │
 ├─────────────┼─────────────┼─────────────┼─────────────┤
-│      A      │     107     │     103     │      0      │
+│      A      │     107     │     129     │      0      │
 ├─────────────┼─────────────┼─────────────┼─────────────┤
-│      B      │     116     │     118     │      0      │
+│      B      │     114     │     132     │      0      │
 ├─────────────┼─────────────┼─────────────┼─────────────┤
 │      C      │      0      │      0      │      0      │
 └─────────────┴─────────────┴─────────────┴─────────────┘
@@ -121,10 +121,10 @@ weights = [8, 7, 6]
 ŷ - y</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2×3 Matrix{Int64}:
  1  1  1
  2  2  2</code></pre><pre><code class="language-julia hljs">MultitargetLPLoss(p=2.5)(ŷ, y, weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">23.29898987322333</code></pre><pre><code class="language-julia hljs"># one &quot;atomic weight&quot; per component of target:
-MultitargetLPLoss(p=2.5, atomic_weights = [1, 10])(ŷ, y, weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">201.4898987322333</code></pre><p>Some tabular formats (e.g., <code>DataFrame</code>) are also supported:</p><pre><code class="language- hljs">using Tables
+MultitargetLPLoss(p=2.5, atomic_weights = [1, 10])(ŷ, y, weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">201.4898987322333</code></pre><p>Some tabular formats (e.g., <code>DataFrame</code>) are also supported:</p><pre><code class="language-julia hljs">using Tables
 t = y&#39; |&gt; Tables.table |&gt; Tables.rowtable
 t̂ = ŷ&#39; |&gt; Tables.table |&gt; Tables.rowtable
-MultitargetLPLoss(p=2.5)(ŷ, y, weights)</code></pre><h2 id="Probabilistic-regression"><a class="docs-heading-anchor" href="#Probabilistic-regression">Probabilistic regression</a><a id="Probabilistic-regression-1"></a><a class="docs-heading-anchor-permalink" href="#Probabilistic-regression" title="Permalink"></a></h2><pre><code class="language- hljs">using StatisticalMeasures
+MultitargetLPLoss(p=2.5)(ŷ, y, weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">23.29898987322333</code></pre><h2 id="Probabilistic-regression"><a class="docs-heading-anchor" href="#Probabilistic-regression">Probabilistic regression</a><a id="Probabilistic-regression-1"></a><a class="docs-heading-anchor-permalink" href="#Probabilistic-regression" title="Permalink"></a></h2><pre><code class="language- hljs">using StatisticalMeasures
 import Distributions:Poisson, Normal
 import Random.seed!
 seed!()
@@ -164,4 +164,4 @@ loss(ŷ[1], y[1])</code></pre><p>This is remedied with the <code>multimeasure</
 
 loss_on_vectors = multimeasure(loss, mode=Sum())
 loss_on_vectors(ŷ, y)</code></pre><pre><code class="language- hljs">class_weights = Dict(&quot;X&quot;=&gt;1, &quot;O&quot;=&gt;10)
-loss_on_vectors(ŷ, y, class_weights)</code></pre><pre><code class="language- hljs">measurements(loss_on_vectors, ŷ, y)</code></pre><p>Wrap again, as shown in the preceding section, to get a multi-target version.</p><p>For distance-based loss functions, wrapping in <code>Measure</code> is not strictly necessary, but does no harm.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Overview</a><a class="docs-footer-nextpage" href="../_auto_generated_list_of_measures/">The Measures »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Sunday 21 May 2023 22:31">Sunday 21 May 2023</span>. Using Julia version 1.9.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+loss_on_vectors(ŷ, y, class_weights)</code></pre><pre><code class="language- hljs">measurements(loss_on_vectors, ŷ, y)</code></pre><p>Wrap again, as shown in the preceding section, to get a multi-target version.</p><p>For distance-based loss functions, wrapping in <code>Measure</code> is not strictly necessary, but does no harm.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Overview</a><a class="docs-footer-nextpage" href="../_auto_generated_list_of_measures/">The Measures »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Sunday 21 May 2023 22:46">Sunday 21 May 2023</span>. Using Julia version 1.9.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
