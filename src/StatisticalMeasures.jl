@@ -41,6 +41,11 @@ include("finite.jl")
 include("probabilistic.jl")
 include("precompile.jl")
 
+# remove after julia LTS supports pkg extensions:
+if !isdefined(Base, :get_extension)
+  include("../ext/LossFunctionsExt.jl")
+end
+
 const MEASURES_FOR_EXPORT = let measures = measures()
     ret = Symbol[]
     for C in keys(measures)

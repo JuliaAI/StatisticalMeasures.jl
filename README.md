@@ -1,15 +1,17 @@
 # StatisticalMeasures.jl
 
+&#128679;
+
 Measures (metrics) for statistics and machine learning.
 
 [![Build Status](https://github.com/JuliaAI/StatisticalMeasures.jl/workflows/CI/badge.svg)](https://github.com/JuliaAI/StatisticalMeasures.jl/actions)
 [![Coverage](https://codecov.io/gh/JuliaAI/StatisticalMeasures.jl/branch/master/graph/badge.svg)](https://codecov.io/github/JuliaAI/StatisticalMeasures.jl?branch=master)
 [![Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://juliaai.github.io/StatisticalMeasures.jl/dev/)
 
-[List]() of provided measures or common aliases thereof. FIX LINK
+[List](https://juliaai.github.io/StatisticalMeasures.jl/dev/_auto_generated_list_of_measures.html#aliases) of provided measures and their aliases thereof.
 
 Powered by
-[StatisticalMeasuresBase.jl](https://github.com/JuliaAI/StatisticalMeasuresBase.jl).
+[StatisticalMeasuresBase.jl](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/).
 
 See [here](https://juliaai.github.io/StatisticalMeasures.jl/dev/) for in-depth
 documentation.
