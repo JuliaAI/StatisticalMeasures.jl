@@ -4,7 +4,7 @@
 <div style="font-size:1.4em;font-weight:bold;">
   <a href="https://juliaai.github.io/StatisticalMeasures.jl/dev/_auto_generated_list_of_measures.html#aliases"
     style="color: #9558B2;">List of measures</a>           &nbsp;|&nbsp;
-  <a href="Examples of Usage"
+  <a href="examples_of_usage"
     style="color: #389826;">Examples</a>
 </div>
 
