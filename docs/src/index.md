@@ -19,7 +19,7 @@ Measures (metrics) for statistics and machine learning</span>
 # Overview
 
 This package defines common measures (metrics) for classification and regression problems
-in statistics and machine learning. To see if your favorite measures is implemented, see
+in statistics and machine learning. To see if your favorite measure is implemented, see
 [this list](@ref aliases). Some multi-target measures are included, but see also [Custom
 multi-target measures](@ref).
 
