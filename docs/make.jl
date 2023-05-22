@@ -20,7 +20,7 @@ makedocs(;
     pages=[
         "Overview" => "index.md",
         "Examples of usage" => "examples_of_usage.md",
-        "The Measures" => "_auto_generated_list_of_measures.md",
+        "The Measures" => "auto_generated_list_of_measures.md",
         "Confusion Matrices" => "confusion_matrices.md",
         "Receiver Operator Characteristics" => "roc.md",
         "Tools" => "tools.md",

@@ -2,7 +2,7 @@
 <script async defer src="https://buttons.github.io/buttons.js"></script>
 
 <div style="font-size:1.4em;font-weight:bold;">
-  <a href="https://juliaai.github.io/StatisticalMeasures.jl/dev/_auto_generated_list_of_measures.html#aliases"
+  <a href="https://juliaai.github.io/StatisticalMeasures.jl/dev/auto_generated_list_of_measures.html#aliases"
     style="color: #9558B2;">List of measures</a>           &nbsp;|&nbsp;
   <a href="examples_of_usage"
     style="color: #389826;">Examples</a>

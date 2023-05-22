@@ -39,7 +39,7 @@ function alias_table()
 end
 
 function write_measures_page(path=PATH_TO_DOCS_SRC)
-    pagename = "_auto_generated_list_of_measures.md"
+    pagename = "auto_generated_list_of_measures.md"
     pagepath = joinpath(path, pagename)
     traits_given_constructor = measures()
     all_constructors = keys(traits_given_constructor) |> collect
