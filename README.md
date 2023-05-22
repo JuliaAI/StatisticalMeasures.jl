@@ -1,7 +1,5 @@
 # StatisticalMeasures.jl
 
-&#128679;
-
 Measures (metrics) for statistics and machine learning.
 
 [![Build Status](https://github.com/JuliaAI/StatisticalMeasures.jl/workflows/CI/badge.svg)](https://github.com/JuliaAI/StatisticalMeasures.jl/actions)
