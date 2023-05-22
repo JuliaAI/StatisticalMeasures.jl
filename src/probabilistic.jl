@@ -103,7 +103,8 @@ Core implementation: [`Functions.auc`](@ref).
 
 $INVARIANT_LABEL
 """,
-    scitype = ""
+    scitype = "",
+    footer="See also [`roc_curve`](@ref). ",
 )
 
 "$AreaUnderCurveDoc"
