@@ -8,7 +8,7 @@ Measures (metrics) for statistics and machine learning.
 [![Coverage](https://codecov.io/gh/JuliaAI/StatisticalMeasures.jl/branch/master/graph/badge.svg)](https://codecov.io/github/JuliaAI/StatisticalMeasures.jl?branch=master)
 [![Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://juliaai.github.io/StatisticalMeasures.jl/dev/)
 
-[List](https://juliaai.github.io/StatisticalMeasures.jl/dev/auto_generated_list_of_measures.html#aliases) of provided measures and their aliases thereof.
+[List](https://juliaai.github.io/StatisticalMeasures.jl/dev/auto_generated_list_of_measures#aliases) of provided measures and their aliases thereof.
 
 Powered by
 [StatisticalMeasuresBase.jl](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/).
