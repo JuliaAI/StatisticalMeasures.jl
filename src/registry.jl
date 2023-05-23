@@ -5,7 +5,7 @@ const ERR_BAD_CONSTRUCTOR = ArgumentError(
 )
 
 """
-    StatisticalMeasusures.measures()
+    measures()
 
 *Experimental* and subject to breaking behavior between patch releases.
 
@@ -15,6 +15,33 @@ traits shared by all measures constructed using the syntax `constructor(args...)
 
 """
 measures() = TRAITS_GIVEN_CONSTRUCTOR
+
+"""
+    measures(needle::Union{AbstractString,Regex})
+
+Return a dictionary keyed on measure constructors that contain `needle` in their document
+strings.
+
+```
+julia> measures("root")
+LittleDict{Any, Any, Vector{Any}, Vector{Any}} with 8 entries:
+  RootMeanSquaredError          => (aliases = ("rms", "rmse", "root_mean_squared_error"), c…
+  MultitargetRootMeanSquaredEr… => (aliases = ("multitarget_rms", "multitarget_rmse", "mult…
+  RootMeanSquaredLogError       => (aliases = ("rmsl", "rmsle", "root_mean_squared_log_erro…
+  MultitargetRootMeanSquaredLo… => (aliases = ("multitarget_rmsl", "multitarget_rmsle", "mu…
+  RootMeanSquaredLogProportion… => (aliases = ("rmslp1",), consumes_multiple_observations =…
+  MultitargetRootMeanSquaredLo… => (aliases = ("multitarget_rmslp1",), consumes_multiple_ob…
+  RootMeanSquaredProportionalE… => (aliases = ("rmsp",), consumes_multiple_observations = t…
+  MultitargetRootMeanSquaredPr… => (aliases = ("multitarget_rmsp",), consumes_multiple_obse…
+```
+
+"""
+function measures(needle::Union{AbstractString,Regex})
+    filter(measures()) do (constructor, _)
+        doc = Base.Docs.doc(constructor) |> string
+        occursin(needle, doc)
+    end
+end
 
 """
     StatisticalMeasures.register(constructor, aliases=String[])

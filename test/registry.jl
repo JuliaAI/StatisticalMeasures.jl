@@ -11,5 +11,11 @@ measure = LPLossOnScalars()
             @test API.$trait(measure) == getproperty(metadata, $trait_ex)
         end |> eval
     end
-    @test API.measures()[LPLossOnVectors].aliases == ("l2", )
+    @test measures()[LPLossOnVectors].aliases == ("l2", )
+end
+
+@testset "search for needle in docstring" begin
+    ms = measures("Matthew")
+    @test [keys(ms)...] == [MatthewsCorrelation,]
+    @test measures()[MatthewsCorrelation] == ms[MatthewsCorrelation]
 end
