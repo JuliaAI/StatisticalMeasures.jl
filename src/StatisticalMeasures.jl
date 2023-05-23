@@ -49,6 +49,7 @@ end
 const MEASURES_FOR_EXPORT = let measures = measures()
     ret = Symbol[]
     for C in keys(measures)
+        C === :precision && continue
         push!(ret, Symbol(C))
         for alias  in measures[C].aliases
             push!(ret, Symbol(alias))
