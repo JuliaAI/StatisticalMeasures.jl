@@ -607,6 +607,10 @@ function Base.show(stream::IO, m::MIME"text/plain", cm::ConfusionMatrix{N}
     write(stream, take!(iob))
 end
 
+function Base.show(stream::IO, cm::ConfusionMatrix{N}) where N
+    mat = matrix(cm, warn=false)
+    print(stream, "ConfusionMatrix{$N}($(repr(mat)))")
+end
 
 # ## STATISTICAL FUNCTIONS ON CONFUSION MATRICES
 
