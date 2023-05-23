@@ -4,20 +4,57 @@ const ERR_BAD_CONSTRUCTOR = ArgumentError(
     "Constructor must have a zero argument method. "
 )
 
+const ERR_BAD_KWARG(trait) = ArgumentError(
+    "`$trait` is not a valid measure trait name. You must choose one of these: "*
+        "$(API.OVERLOADABLE_TRAITS_LIST). "
+)
+
 """
-    measures()
+    measures(; filter_options...)
 
 *Experimental* and subject to breaking behavior between patch releases.
 
 Return a dictionary, `dict`, keyed on measure constructors provided by
-StatisticalMeasures.jl. The value of `dict[constructor]` provides information about
-traits shared by all measures constructed using the syntax `constructor(args...)`.
+StatisticalMeasures.jl. The value of `dict[constructor]` provides information about traits
+(measure "metadata") shared by all measures constructed using the syntax
+`constructor(args...)`.
+
+# Filter options
+
+One can filter on the basis of measure trait values, as shown in this example:
+
+```
+using StatisticalMeasures
+using ScientificTypes
+
+julia> measures(
+    observation_scitype = Union{Missing,Multiclass},
+    supports_class_weights = true,
+)
+```
+
+For more general searches, use a `filter(measures()) do (_, metadata) ... end`
+construction.
 
 """
-measures() = TRAITS_GIVEN_CONSTRUCTOR
+measures(; kwargs...) = filter(TRAITS_GIVEN_CONSTRUCTOR) do (_, metadata)
+    trait_value_pairs = collect(kwargs)
+    traits = first.(trait_value_pairs)
+    for trait in traits
+        trait in API.OVERLOADABLE_TRAITS || throw(ERR_BAD_KWARG(trait))
+    end
+    all(trait_value_pairs) do pair
+        trait = first(pair)
+        value = last(pair)
+        getproperty(metadata, trait) == value
+    end
+end
+
 
 """
     measures(needle::Union{AbstractString,Regex})
+
+*Experimental* and subject to breaking behavior between patch releases.
 
 Return a dictionary keyed on measure constructors that contain `needle` in their document
 strings.
@@ -36,12 +73,13 @@ LittleDict{Any, Any, Vector{Any}, Vector{Any}} with 8 entries:
 ```
 
 """
-function measures(needle::Union{AbstractString,Regex})
-    filter(measures()) do (constructor, _)
+function measures(needle::Union{AbstractString,Regex}; kwargs...)
+    filter(measures(; kwargs...)) do (constructor, _)
         doc = Base.Docs.doc(constructor) |> string
         occursin(needle, doc)
     end
 end
+
 
 """
     StatisticalMeasures.register(constructor, aliases=String[])
