@@ -50,10 +50,10 @@ Random.seed!()
 y = rand(&quot;ABC&quot;, 1000) |&gt; categorical
 ŷ = rand(&quot;ABC&quot;, 1000) |&gt; categorical
 class_weights = Dict(&#39;A&#39; =&gt; 1, &#39;B&#39; =&gt;2, &#39;C&#39; =&gt; 10)
-MulticlassFScore(beta=0.5, average=MacroAvg())(ŷ, y,  class_weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1.5514333972213787</code></pre><pre><code class="language-julia hljs">MulticlassFScore(beta=0.5, average=NoAvg())(ŷ, y,  class_weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">LittleDict{CategoricalArrays.CategoricalValue{Char, UInt32}, Float64, Tuple{CategoricalArrays.CategoricalValue{Char, UInt32}, CategoricalArrays.CategoricalValue{Char, UInt32}, CategoricalArrays.CategoricalValue{Char, UInt32}}, Tuple{Float64, Float64, Float64}} with 3 entries:
-  &#39;A&#39; =&gt; 0.395363
-  &#39;B&#39; =&gt; 0.767813
-  &#39;C&#39; =&gt; 3.49112</code></pre><p>Unseen classes are tracked, when using <code>CategoricalArrays</code>, as here:</p><pre><code class="language-julia hljs"># find &#39;C&#39;-free indices
+MulticlassFScore(beta=0.5, average=MacroAvg())(ŷ, y,  class_weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1.3797721366437479</code></pre><pre><code class="language-julia hljs">MulticlassFScore(beta=0.5, average=NoAvg())(ŷ, y,  class_weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">LittleDict{CategoricalArrays.CategoricalValue{Char, UInt32}, Float64, Tuple{CategoricalArrays.CategoricalValue{Char, UInt32}, CategoricalArrays.CategoricalValue{Char, UInt32}, CategoricalArrays.CategoricalValue{Char, UInt32}}, Tuple{Float64, Float64, Float64}} with 3 entries:
+  &#39;A&#39; =&gt; 0.3561
+  &#39;B&#39; =&gt; 0.591074
+  &#39;C&#39; =&gt; 3.19214</code></pre><p>Unseen classes are tracked, when using <code>CategoricalArrays</code>, as here:</p><pre><code class="language-julia hljs"># find &#39;C&#39;-free indices
 mask = y .!= &#39;C&#39; .&amp;&amp; ŷ .!= &#39;C&#39;;
 # and remove:
 y = y[mask]
@@ -63,9 +63,9 @@ ŷ = ŷ[mask]
 ┌─────────────┼─────────────┬─────────────┬─────────────┤
 │  Predicted  │      A      │      B      │      C      │
 ├─────────────┼─────────────┼─────────────┼─────────────┤
-│      A      │     133     │     104     │      0      │
+│      A      │     122     │     117     │      0      │
 ├─────────────┼─────────────┼─────────────┼─────────────┤
-│      B      │     86      │     125     │      0      │
+│      B      │     119     │     98      │      0      │
 ├─────────────┼─────────────┼─────────────┼─────────────┤
 │      C      │      0      │      0      │      0      │
 └─────────────┴─────────────┴─────────────┴─────────────┘
@@ -131,31 +131,31 @@ seed!()
 
 y = rand(20)
 ŷ = [Normal(rand(), 0.5) for i in 1:20]
-ŷ[1]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Distributions.Normal{Float64}(μ=0.12654933935081036, σ=0.5)</code></pre><pre><code class="language-julia hljs">log_loss(ŷ, y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.6688573046961637</code></pre><pre><code class="language-julia hljs">weights = rand(20)
-log_loss(ŷ, y, weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.3273142182513262</code></pre><pre><code class="language-julia hljs">weights = rand(20)
+ŷ[1]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Distributions.Normal{Float64}(μ=0.12905809743663932, σ=0.5)</code></pre><pre><code class="language-julia hljs">log_loss(ŷ, y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.6336942029830173</code></pre><pre><code class="language-julia hljs">weights = rand(20)
+log_loss(ŷ, y, weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.3202252961909569</code></pre><pre><code class="language-julia hljs">weights = rand(20)
 measurements(log_loss, ŷ, y, weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">20-element Vector{Float64}:
- 0.16488106610182385
- 0.023900213672357676
- 0.0747920678399446
- 0.8856545957277476
- 1.0943862114946823
- 0.13097575998768196
- 0.23559699051253405
- 0.4846306355622143
- 0.6341293630827985
- 0.9886919932651117
- 0.4475725603786283
- 0.21519595361946964
- 0.05419733220263165
- 0.07577623848815881
- 0.17273621262910618
- 0.062325189878720634
- 0.5406658210732114
- 0.47721297979695665
- 0.22818540535807996
- 0.13083205150563776</code></pre><p>An example with <code>Count</code> (integer) data:</p><pre><code class="language-julia hljs">y = rand(1:10, 20)
+ 0.17664298090635908
+ 0.058104557807724985
+ 0.1290239906481621
+ 0.7772527860518382
+ 0.8777826596387708
+ 0.5614069968859816
+ 0.10102712339342625
+ 0.007930793909743336
+ 0.27907766623555375
+ 0.42618882443314365
+ 0.16881398791082386
+ 0.16803016261184242
+ 0.8980049442595247
+ 0.24863315427850857
+ 0.19483404738679003
+ 0.7670702815010736
+ 0.10931733014834534
+ 0.12629196690320205
+ 0.030373728903937507
+ 0.20681657533975945</code></pre><p>An example with <code>Count</code> (integer) data:</p><pre><code class="language-julia hljs">y = rand(1:10, 20)
 ŷ = [Poisson(10*rand()) for i in 1:20]
-ŷ[1]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Distributions.Poisson{Float64}(λ=0.012881772724195883)</code></pre><pre><code class="language-julia hljs">brier_loss(ŷ, y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.023655709426473517</code></pre><h2 id="Custom-multi-target-measures"><a class="docs-heading-anchor" href="#Custom-multi-target-measures">Custom multi-target measures</a><a id="Custom-multi-target-measures-1"></a><a class="docs-heading-anchor-permalink" href="#Custom-multi-target-measures" title="Permalink"></a></h2><p>Here&#39;s an example of constructing a multi-target regression measure, for data with 3 observations of a 2-component target:</p><pre><code class="language-julia hljs">using StatisticalMeasures
+ŷ[1]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Distributions.Poisson{Float64}(λ=6.389755038214563)</code></pre><pre><code class="language-julia hljs">brier_loss(ŷ, y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">-0.050195477617791084</code></pre><h2 id="Custom-multi-target-measures"><a class="docs-heading-anchor" href="#Custom-multi-target-measures">Custom multi-target measures</a><a id="Custom-multi-target-measures-1"></a><a class="docs-heading-anchor-permalink" href="#Custom-multi-target-measures" title="Permalink"></a></h2><p>Here&#39;s an example of constructing a multi-target regression measure, for data with 3 observations of a 2-component target:</p><pre><code class="language-julia hljs">using StatisticalMeasures
 
 # last index is observation index:
 y = [&quot;X&quot; &quot;O&quot; &quot;O&quot;; &quot;O&quot; &quot;X&quot; &quot;X&quot;]
@@ -188,4 +188,4 @@ loss_on_vectors(ŷ, y, class_weights)</code></pre><pre class="documenter-exampl
  1.4
  0.3999999999999999
  1.2
- 0.19999999999999996</code></pre><p>Wrap again, as shown in the preceding section, to get a multi-target version.</p><p>For distance-based loss functions, wrapping in <code>Measure</code> is not strictly necessary, but does no harm.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Overview</a><a class="docs-footer-nextpage" href="../auto_generated_list_of_measures/">The Measures »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Tuesday 23 May 2023 03:47">Tuesday 23 May 2023</span>. Using Julia version 1.9.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 0.19999999999999996</code></pre><p>Wrap again, as shown in the preceding section, to get a multi-target version.</p><p>For distance-based loss functions, wrapping in <code>Measure</code> is not strictly necessary, but does no harm.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Overview</a><a class="docs-footer-nextpage" href="../auto_generated_list_of_measures/">The Measures »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Tuesday 23 May 2023 04:50">Tuesday 23 May 2023</span>. Using Julia version 1.9.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
