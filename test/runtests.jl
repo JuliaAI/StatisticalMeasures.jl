@@ -47,3 +47,7 @@ end
 @testset "LossFunctionsExt.jl" begin
     include("LossFunctionsExt.jl")
 end
+
+@testset "ScientificTypesExt.jl" begin
+    include("ScientificTypesExt.jl")
+end

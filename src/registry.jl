@@ -10,7 +10,7 @@ const ERR_BAD_KWARG(trait) = ArgumentError(
 )
 
 """
-    measures(; filter_options...)
+    measures(; trait_options...)
 
 *Experimental* and subject to breaking behavior between patch releases.
 
@@ -19,13 +19,13 @@ StatisticalMeasures.jl. The value of `dict[constructor]` provides information ab
 (measure "metadata") shared by all measures constructed using the syntax
 `constructor(args...)`.
 
-# Filter options
+# Trait options
 
 One can filter on the basis of measure trait values, as shown in this example:
 
 ```
 using StatisticalMeasures
-using ScientificTypes
+import ScientificTypesBase.Multiclass
 
 julia> measures(
     observation_scitype = Union{Missing,Multiclass},
@@ -33,12 +33,36 @@ julia> measures(
 )
 ```
 
-For more general searches, use a `filter(measures()) do (_, metadata) ... end`
-construction.
+---
+
+    measures(y; trait_filters...)
+    measures(yhat, y; trait_filters...)
+
+*Experimental* and subject to breaking behavior between patch releases.
+
+Assuming, ScientificTypes.jl has been imported, find measures that can be applied to data
+with the specified data arguments `(y,)` or `(yhat, y)`. It is assumed that the arguments
+contain multiple observations (have types implementing `MLUtils.getobs`).
+
+Returns a dictionary keyed on the constructors of such measures. Additional
+`trait_filters` are the same as for the zero argument `measures` method.
+
+```julia
+using StatisticalArrays
+using ScientificTypes
+
+julia> measures(rand(3), rand(3), supports_weights=false)
+LittleDict{Any, Any, Vector{Any}, Vector{Any}} with 1 entry:
+  RSquared => (aliases = ("rsq", "rsquared"), consumes_multiple_observations = true, can_re…
+```
+
+*Warning.* Matching is based only on the *first* observation of the arguments provided,
+and must be interpreted carefully if, for example, `y` or `yhat` are vectors with `Union`
+or other abstract element types.
 
 """
-measures(; kwargs...) = filter(TRAITS_GIVEN_CONSTRUCTOR) do (_, metadata)
-    trait_value_pairs = collect(kwargs)
+measures(; trait_options...) = filter(TRAITS_GIVEN_CONSTRUCTOR) do (_, metadata)
+    trait_value_pairs = collect(trait_options)
     traits = first.(trait_value_pairs)
     for trait in traits
         trait in API.OVERLOADABLE_TRAITS || throw(ERR_BAD_KWARG(trait))
@@ -50,36 +74,26 @@ measures(; kwargs...) = filter(TRAITS_GIVEN_CONSTRUCTOR) do (_, metadata)
     end
 end
 
-
 """
-    measures(needle::Union{AbstractString,Regex})
+    measures(needle::Union{AbstractString,Regex}; trait_options...)
 
 *Experimental* and subject to breaking behavior between patch releases.
 
-Return a dictionary keyed on measure constructors that contain `needle` in their document
-strings.
+Find measures that contain `needle` in their document string.  Returns a dictionary keyed
+on the constructors of such measures.
 
 ```
-julia> measures("root")
-LittleDict{Any, Any, Vector{Any}, Vector{Any}} with 8 entries:
-  RootMeanSquaredError          => (aliases = ("rms", "rmse", "root_mean_squared_error"), c…
-  MultitargetRootMeanSquaredEr… => (aliases = ("multitarget_rms", "multitarget_rmse", "mult…
-  RootMeanSquaredLogError       => (aliases = ("rmsl", "rmsle", "root_mean_squared_log_erro…
-  MultitargetRootMeanSquaredLo… => (aliases = ("multitarget_rmsl", "multitarget_rmsle", "mu…
-  RootMeanSquaredLogProportion… => (aliases = ("rmslp1",), consumes_multiple_observations =…
-  MultitargetRootMeanSquaredLo… => (aliases = ("multitarget_rmslp1",), consumes_multiple_ob…
-  RootMeanSquaredProportionalE… => (aliases = ("rmsp",), consumes_multiple_observations = t…
-  MultitargetRootMeanSquaredPr… => (aliases = ("multitarget_rmsp",), consumes_multiple_obse…
+julia> measures("Matthew")
+LittleDict{Any, Any, Vector{Any}, Vector{Any}} with 1 entry:
+  MatthewsCorrelation => (aliases = ("matthews_correlation", "mcc"), consumes_multiple_obse…
 ```
-
 """
-function measures(needle::Union{AbstractString,Regex}; kwargs...)
-    filter(measures(; kwargs...)) do (constructor, _)
+function measures(needle::Union{AbstractString,Regex}; trait_options...)
+    filter(measures(; trait_options...)) do (constructor, _)
         doc = Base.Docs.doc(constructor) |> string
         occursin(needle, doc)
     end
 end
-
 
 """
     StatisticalMeasures.register(constructor, aliases=String[])

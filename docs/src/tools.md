@@ -3,7 +3,7 @@
 | method                                        | description                                                                          |
 |:----------------------------------------------|:-------------------------------------------------------------------------------------|
 | [`measurements`](@ref)`(measure, ...)`        | for obtaining per-observation measurements, instead of aggregated ones               |
-| [`measures()`](@ref)                          | dictionary of traits keyed on measure constructors                                   |
+| [`measures()`](@ref)                          | dictionary of traits keyed on measure constructors, with filter options              |
 | [`unfussy(measure)`](@ref)                    | new measure without argument checks¹                                                 |
 | [`multimeasure`](@ref)`(measure; options...)` | wrapper to broadcast measures over multiple observations                             |
 | [`robust_measure(measure)`](@ref)             | wrapper to silently treat unsupported weights as uniform                             |

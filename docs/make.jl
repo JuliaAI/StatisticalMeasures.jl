@@ -3,6 +3,7 @@ using StatisticalMeasures
 using StatisticalMeasures.StatisticalMeasuresBase
 using StatisticalMeasures.LearnAPI
 using ScientificTypesBase
+using ScientificTypes
 
 const REPO="github.com/JuliaAI/StatisticalMeasures.jl"
 
