@@ -163,7 +163,7 @@ end
 
 # # FUNCTIONS ON MATRICES INTERPRETED AS CONFUSION MATRICES
 
-clean(s) = join(split(s, "_"), " ")
+clean(s) = join(split(last(split(s, ".")), "_"), " ")
 function docstring(measure; sig="(m)", name=clean(measure), binary=false, the=false)
     footer = binary ?
         "The first index corresponds to the \"negative\" class, "*
