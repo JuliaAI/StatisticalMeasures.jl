@@ -1,7 +1,7 @@
 name = "StatisticalMeasures"
 uuid = "a19d573c-0a75-4610-95b3-7071388c7541"
 authors = ["Anthony D. Blaom <anthony.blaom@gmail.com>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
@@ -13,6 +13,7 @@ LossFunctions = "30fc2ffe-d236-52d8-8643-a9d8f7c094a7"
 MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 PrecompileTools = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
+ScientificTypes = "321657f4-b219-11e9-178b-2701a2544e81"
 ScientificTypesBase = "30f210dd-8aff-4c5f-94ba-8e64358c1161"
 StatisticalMeasuresBase = "c062fc1d-0d66-479b-b6ac-8b44719de4cc"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
@@ -20,9 +21,11 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [weakdeps]
 LossFunctions = "30fc2ffe-d236-52d8-8643-a9d8f7c094a7"
+ScientificTypes = "321657f4-b219-11e9-178b-2701a2544e81"
 
 [extensions]
 LossFunctionsExt = "LossFunctions"
+ScientificTypesExt = "ScientificTypes"
 
 [compat]
 CategoricalArrays = "0.10"
@@ -33,6 +36,7 @@ LossFunctions = "0.10"
 MacroTools = "0.5"
 OrderedCollections = "1"
 PrecompileTools = "1.1"
+ScientificTypes = "3"
 ScientificTypesBase = "3"
 StatisticalMeasuresBase = "0.1"
 StatsBase = "0.33, 0.34"

@@ -35,7 +35,7 @@ bacc == BalancedAccuracy() == BalancedAccuracy(adjusted=false)
 - [Probabilistic regression](@ref)
 - [Custom multi-target measures](@ref)
 - [Using losses from LossFunctions.jl](@ref)
-
+- [Measure search (experimental feature)](@ref)
 
 ## Binary classification
 
@@ -333,3 +333,23 @@ Wrap again, as shown in the preceding section, to get a multi-target version.
 
 For distance-based loss functions, wrapping in `Measure` is not strictly
 necessary, but does no harm.
+
+
+## Measure search (experimental feature)
+
+```@example 29
+using StatisticalMeasures
+using ScientificTypes
+
+y = rand(3)
+yhat = rand(3)
+options = measures(yhat, y, supports_weights=true)
+```
+
+```@example 29
+options[LPLoss]
+```
+
+```@example 29
+measures("Matthew")
+```

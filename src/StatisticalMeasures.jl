@@ -43,7 +43,8 @@ include("precompile.jl")
 
 # remove after julia LTS supports pkg extensions:
 if !isdefined(Base, :get_extension)
-  include("../ext/LossFunctionsExt.jl")
+    include("../ext/LossFunctionsExt.jl")
+    include("../ext/ScientificTypesExt.jl")
 end
 
 const MEASURES_FOR_EXPORT = let measures = measures()
@@ -51,6 +52,7 @@ const MEASURES_FOR_EXPORT = let measures = measures()
     for C in keys(measures)
         push!(ret, Symbol(C))
         for alias  in measures[C].aliases
+            alias == "precision" && continue
             push!(ret, Symbol(alias))
         end
     end

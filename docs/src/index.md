@@ -2,7 +2,7 @@
 <script async defer src="https://buttons.github.io/buttons.js"></script>
 
 <div style="font-size:1.4em;font-weight:bold;">
-  <a href="https://juliaai.github.io/StatisticalMeasures.jl/dev/_auto_generated_list_of_measures.html#aliases"
+  <a href="https://juliaai.github.io/StatisticalMeasures.jl/dev/auto_generated_list_of_measures#aliases"
     style="color: #9558B2;">List of measures</a>           &nbsp;|&nbsp;
   <a href="examples_of_usage"
     style="color: #389826;">Examples</a>
@@ -19,7 +19,7 @@ Measures (metrics) for statistics and machine learning</span>
 # Overview
 
 This package defines common measures (metrics) for classification and regression problems
-in statistics and machine learning. To see if your favorite measures is implemented, see
+in statistics and machine learning. To see if your favorite measure is implemented, see
 [this list](@ref aliases). Some multi-target measures are included, but see also [Custom
 multi-target measures](@ref).
 

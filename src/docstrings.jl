@@ -112,7 +112,7 @@ function docstring(signature; body="", footer="", scitype="")
     API.can_report_unaggregated(m) &&
         (ret *= "\n\nMeasurements are aggregated. "*
         "To obtain a separate measurement for each observation, "*
-        "use the syntax `measurements(m, ŷ, y)`. ")
+        "use the syntax `measurements($m_str, ŷ, y)`. ")
     ret *= "Generally, an observation `obs` in `MLUtils.eachobs(y)` is expected to satisfy "*
         "`ScientificTypes.scitype(obs)<:`$scitype. "
     # if kind_of_proxy == LearnAPI.LiteralTarget()
