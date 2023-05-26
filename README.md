@@ -14,6 +14,8 @@ Powered by
 See [here](https://juliaai.github.io/StatisticalMeasures.jl/dev/) for in-depth
 documentation.
 
+[List](https://github.com/FluxML/FluxML-Community-Call-Minutes/discussions/38) of other Julia packages providing metrics.
+
 ## Acknowledgements
 
 A substantial part of the StatisticalMeasures.jl codebase is adapted from
