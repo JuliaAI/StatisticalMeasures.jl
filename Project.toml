@@ -1,7 +1,7 @@
 name = "StatisticalMeasures"
 uuid = "a19d573c-0a75-4610-95b3-7071388c7541"
 authors = ["Anthony D. Blaom <anthony.blaom@gmail.com>"]
-version = "0.1.1"
+version = "0.1.2"
 
 [deps]
 CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
@@ -32,7 +32,7 @@ CategoricalArrays = "0.10"
 CategoricalDistributions = "0.1"
 Distributions = "0.25"
 LearnAPI = "0.1"
-LossFunctions = "0.10"
+LossFunctions = "0.10, 0.11"
 MacroTools = "0.5"
 OrderedCollections = "1"
 PrecompileTools = "1.1"

@@ -116,7 +116,7 @@ Unseen classes are tracked, when using `CategoricalArrays`, as here:
 ```@example 23
 # find 'C'-free indices
 mask = y .!= 'C' .&& ŷ .!= 'C';
-# and remove:
+# remove observations with 'C' class::
 y = y[mask]
 ŷ = ŷ[mask]
 'C' in y ∪ ŷ
