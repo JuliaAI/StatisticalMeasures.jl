@@ -554,27 +554,30 @@ function Base.show(stream::IO, m::MIME"text/plain", cm::ConfusionMatrix{N}
                    ) where N
     labels = string.(levels(cm))
     width    = displaysize(stream)[2]
-    cw       = 13
+    mincw    = ceil(Int, 12/N)
+    cw       = max(length(string(maximum(cm.mat))),maximum(length.(labels)),mincw)
     textlim  = 9
-    totalwidth = cw * (N+1) + N + 2
+    firstcw  = max(length(string(maximum(cm.mat))),maximum(length.(labels)),textlim)    
+    totalwidth = firstcw + cw * N + N + 2
     width < totalwidth && (show(stream, m, cm.mat); return)
 
     iob     = IOBuffer()
     wline   = s -> write(iob, s * "\n")
     splitcw = s -> (w = cw - length(s); splitw(w))
+    splitfirstcw = s -> (w = firstcw - length(s); splitw(w))
     cropw   = s -> length(s) > textlim ? s[1:prevind(s, textlim)] * "…" : s
 
     # 1.a top box
-    " "^(cw+1) * "┌" * "─"^((cw + 1) * N - 1) * "┐" |> wline
+    " "^(firstcw+1) * "┌" * "─"^((cw + 1) * N - 1) * "┐" |> wline
     gt = "Ground Truth"
     w  = (cw + 1) * N - 1 - length(gt)
     sp1, sp2 = splitw(w)
-    " "^(cw+1) * "│" * " "^sp1 * gt * " "^sp2 * "│" |> wline
+    " "^(firstcw+1) * "│" * " "^sp1 * gt * " "^sp2 * "│" |> wline
     # 1.b separator
-    "┌" * "─"^cw * "┼" * ("─"^cw * "┬")^(N-1) * "─"^cw * "┤" |> wline
+    "┌" * "─"^firstcw * "┼" * ("─"^cw * "┬")^(N-1) * "─"^cw * "┤" |> wline
     # 2.a description line
     pr = "Predicted"
-    sp1, sp2 = splitcw(pr)
+    sp1, sp2 = splitfirstcw(pr)
     partial = "│" * " "^sp1 * pr * " "^sp2 * "│"
     for c in 1:N
         # max = 10
@@ -584,12 +587,12 @@ function Base.show(stream::IO, m::MIME"text/plain", cm::ConfusionMatrix{N}
     end
     partial |> wline
     # 2.b separating line
-    "├" * "─"^cw * "┼" * ("─"^cw * "┼")^(N-1) * ("─"^cw * "┤") |> wline
+    "├" * "─"^firstcw * "┼" * ("─"^cw * "┼")^(N-1) * ("─"^cw * "┤") |> wline
     # 2.c line by line
     for c in 1:N
         # line
         s  = labels[c] |> cropw
-        sp1, sp2 = splitcw(s)
+        sp1, sp2 = splitfirstcw(s)
         partial = "│" * " "^sp1 * s * " "^sp2 * "│"
         for r in 1:N
             e = string(cm.mat[c, r])
@@ -599,11 +602,11 @@ function Base.show(stream::IO, m::MIME"text/plain", cm::ConfusionMatrix{N}
         partial |> wline
         # separator
         if c < N
-            "├" * "─"^cw * "┼" * ("─"^cw * "┼")^(N-1) * ("─"^cw * "┤") |> wline
+            "├" * "─"^firstcw * "┼" * ("─"^cw * "┼")^(N-1) * ("─"^cw * "┤") |> wline
         end
     end
     # 2.d final line
-    "└" * "─"^cw * "┴" * ("─"^cw * "┴")^(N-1) * ("─"^cw * "┘") |> wline
+    "└" * "─"^firstcw * "┴" * ("─"^cw * "┴")^(N-1) * ("─"^cw * "┘") |> wline
     write(stream, take!(iob))
 end
 
