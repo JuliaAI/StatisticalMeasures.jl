@@ -21,7 +21,7 @@
     )
     @test_throws(
         API.ERR_POOL,
-    roc_curve(ŷ, categorical(rand(1:2, 8)))
+    roc_curve(ŷ, categorical([1, 2, 2, 2, 2, 2, 1, 2]))
     )
 
     fprs, tprs, ts = @test_logs(
