@@ -73,7 +73,7 @@ accuracy(ŷ, y, class_weights)
 accuracy(ŷ, y, weights, class_weights)
 ```
 
-To get individual per-observation weights, use [`measurements`](@ref):
+To get a measurement for each individual observation, use [`measurements`](@ref):
 
 ```@example 20
 measurements(accuracy, ŷ, y, weights, class_weights)
