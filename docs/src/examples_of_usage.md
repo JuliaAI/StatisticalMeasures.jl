@@ -299,7 +299,7 @@ import LossFunctions as LF
 loss = Measure(LF.L1HingeLoss())
 ```
 
-This loss can only called on scalars (true for LossFunctions.jl losses since v0.10):
+This loss can only be called on scalars (true for LossFunctions.jl losses since v0.10):
 
 ```@example 28
 using CategoricalArrays
