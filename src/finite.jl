@@ -500,7 +500,7 @@ const FScoreType = API.FussyMeasure{<:API.RobustMeasure{<:_FScore}}
 
 # Allow callable on confusion matrices:
 (measure::FScoreType)(cm::ConfusionMatrices.ConfusionMatrix) =
-        ConfusionMatrices.fscore(cm, measures.beta)
+        ConfusionMatrices.fscore(cm, measure.beta)
 
 # these traits will be inherited by `FScore`:
 @trait(
