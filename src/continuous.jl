@@ -351,10 +351,10 @@ const RootMeanSquaredProportionalErrorDoc = docstring(
     scitype=DOC_INFINITE,
     body=
 """
-Specifically, compute the mean of ``(ŷ_i-y_i \\over y_i)^2}`` over all pairs of
-observations ``(ŷ_i, y_i)`` in `(ŷ, y)`, and return the square root of the result. More
+Specifically, compute the mean of `((ŷᵢ-yᵢ)/yᵢ)^2}` over all pairs of
+observations `(ŷᵢ, yᵢ)` in `(ŷ, y)`, and return the square root of the result. More
 generally, pre-multiply the values averaged by the specified weights. Terms for which
-``|y_i|``<`tol` are dropped in the summation, but counts still
+`abs(yᵢ) < tol` are dropped in the summation, but counts still
 contribute to the mean normalization factor.
 """,
 )
