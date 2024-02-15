@@ -251,7 +251,7 @@ function ConfusionMatrix(m, levels::AbstractVector{L}; ordered=false, checks=tru
         ))
     end
     index_given_level =
-        LittleDict{L, Int, Vector{L}, Vector{Int}}(levels, eachindex(levels)) |> freeze
+        LittleDict{L, Int, Vector{L}, Vector{Int}}(levels, eachindex(levels))
     ConfusionMatrix(m, index_given_level; ordered, checks=false)
 end
 
@@ -533,15 +533,13 @@ end
 
 
 # ## Final method to do the computation
-
-function _confmat(ŷ, y, indexer, levels, ordered)
+function _confmat(ŷ, y, indexer::F, levels, ordered) where F
     nc = length(levels)
     cmat = zeros(Int, nc, nc)
     @inbounds for i in eachindex(y)
         (ismissing(y[i]) || ismissing(ŷ[i])) && continue
         cmat[get(indexer, ŷ[i]), get(indexer, y[i])] += 1
     end
-    index_given_level = LittleDict(c => get(indexer, c) for c in levels) |> freeze
     return ConfusionMatrix(cmat, levels; ordered, checks=false)
 end
 
