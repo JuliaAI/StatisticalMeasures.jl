@@ -222,7 +222,11 @@ function ConfusionMatrix(
             "to be integers from 1 to $N. "
         ))
     end
-    index_given_level = freeze(dic)
+    if dic isa OrderedCollections.FrozenLittleDict
+        index_given_level = dic
+    else
+        index_given_level = freeze(dic)
+    end
     ConfusionMatrix{N,ordered,L}(m, index_given_level)
 end
 
@@ -490,7 +494,6 @@ function confmat(ŷ, y, _levels, _perm, rev)
 
     levels = apply(perm, levels)
     indexer = LittleDict(levels[i] => i for i in eachindex(levels)) |> freeze
-
     _confmat(ŷ, y, indexer, levels, ordered)
 end
 
@@ -541,6 +544,16 @@ function _confmat(ŷ, y, indexer::F, levels, ordered) where F
         cmat[get(indexer, ŷ[i]), get(indexer, y[i])] += 1
     end
     return ConfusionMatrix(cmat, levels; ordered, checks=false)
+end
+
+function _confmat(ŷ, y, indexer::AbstractDict{L,I}, levels, ordered) where {L,I<:Integer}
+    nc = length(levels)
+    cmat = zeros(Int, nc, nc)
+    @inbounds for i in eachindex(y)
+        (ismissing(y[i]) || ismissing(ŷ[i])) && continue
+        cmat[get(indexer, ŷ[i]), get(indexer, y[i])] += 1
+    end
+    return ConfusionMatrix(cmat, indexer; ordered, checks=false)
 end
 
 
