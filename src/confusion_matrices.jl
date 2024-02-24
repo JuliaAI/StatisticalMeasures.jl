@@ -204,7 +204,7 @@ See also [`$CM.confmat`](@ref).
 """
 function ConfusionMatrix(
     m,
-    dic::AbstractDict{L,I};
+    dic::OrderedCollections.FrozenLittleDict{L, I};
     checks=true,
     ordered=false,
     ) where {L,I<:Integer}
@@ -222,12 +222,16 @@ function ConfusionMatrix(
             "to be integers from 1 to $N. "
         ))
     end
-    if dic isa OrderedCollections.FrozenLittleDict
-        index_given_level = dic
-    else
-        index_given_level = freeze(dic)
-    end
-    ConfusionMatrix{N,ordered,L}(m, index_given_level)
+    
+    ConfusionMatrix{N,ordered,L}(m, dic)
+end
+function ConfusionMatrix(
+    m,
+    dic::AbstractDict;
+    checks=true,
+    ordered=false,
+    ) 
+    ConfusionMatrix(m, freeze(dic); checks, ordered)
 end
 
 """
