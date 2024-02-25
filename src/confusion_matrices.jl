@@ -204,14 +204,13 @@ See also [`$CM.confmat`](@ref).
 """
 function ConfusionMatrix(
     m,
-    dic::OrderedCollections.FrozenLittleDict{L, I};
+    dic::LittleDict{L, I, NTuple{N,L}, NTuple{N,I}};
     checks=true,
     ordered=false,
-    ) where {L,I<:Integer}
+    ) where {L,I<:Integer,N}
     s = size(m)
-    N = s[1]
     if checks
-        N == s[2] || throw(ArgumentError("Expected a square matrix."))
+        N == s[1] == s[2] || throw(ArgumentError("Expected a square matrix."))
         N > 1 || throw(ArgumentError("Expected a matrix of size ≥ 2x2."))
         length(unique(keys(dic))) == N || throw(ArgumentError(
         "Expected dictionary with $N unique keys (levels) as "*
