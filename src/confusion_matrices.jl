@@ -208,8 +208,8 @@ function ConfusionMatrix(
     checks=true,
     ordered=false,
     ) where {L,I<:Integer,N}
-    s = size(m)
     if checks
+        s = size(m)
         N == s[1] == s[2] || throw(ArgumentError("Expected a square matrix."))
         N > 1 || throw(ArgumentError("Expected a matrix of size ≥ 2x2."))
         length(unique(keys(dic))) == N || throw(ArgumentError(
@@ -221,7 +221,6 @@ function ConfusionMatrix(
             "to be integers from 1 to $N. "
         ))
     end
-    
     ConfusionMatrix{N,ordered,L}(m, dic)
 end
 function ConfusionMatrix(
