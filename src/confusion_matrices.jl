@@ -185,8 +185,8 @@ ordered confusion matrices, see [`$CM.confmat`](@ref).
 
 """
 struct ConfusionMatrix{N,O,L}
-    mat::Matrix{Int}
-    index_given_level::LittleDict{L, Int, NTuple{N,L}, NTuple{N,Int}}
+    mat::Matrix{<:Integer}
+    index_given_level::LittleDict{L, I, NTuple{N,L}, NTuple{N,I}} where I<:Integer
 end
 
 """
