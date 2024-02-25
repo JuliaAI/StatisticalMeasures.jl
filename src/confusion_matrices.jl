@@ -496,7 +496,8 @@ function confmat(ŷ, y, _levels, _perm, rev)
     perm = permutation(_perm,  rev, levels)
 
     levels = apply(perm, levels)
-    indexer = LittleDict(levels[i] => i for i in eachindex(levels)) |> freeze
+    L = eltype(levels)
+    indexer = LittleDict{L, Int, Vector{L}, Vector{Int}}(levels, eachindex(levels)) |> freeze
     _confmat(ŷ, y, indexer, levels, ordered)
 end
 
