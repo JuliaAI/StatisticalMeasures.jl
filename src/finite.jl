@@ -298,7 +298,7 @@ register(
     "balanced_accuracy",
     "bacc",
     "bac",
-    "Ppprobability_of_correct_classification",
+    "probability_of_correct_classification",
 )
 
 const BalancedAccuracyDoc = docstring(
