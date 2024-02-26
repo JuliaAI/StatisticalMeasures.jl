@@ -293,7 +293,13 @@ const BalancedAccuracyType = API.FussyMeasure{
     human_name="balanced accuracy",
 )
 
-register(BalancedAccuracy, "balanced_accuracy", "bacc", "bac")
+register(
+    BalancedAccuracy,
+    "balanced_accuracy",
+    "bacc",
+    "bac",
+    "Ppprobability_of_correct_classification",
+)
 
 const BalancedAccuracyDoc = docstring(
     "BalancedAccuracy(; adjusted=false)",

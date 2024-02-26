@@ -178,7 +178,7 @@ const LogScoreDoc = docstring(
     body=
 """
 The score is a mean of observational scores. More generally, observational scores are
-pre-multiplied by the specified weights before avaraging. See below for the form that
+pre-multiplied by the specified weights before averaging. See below for the form that
 probabilistic predictions `ŷ` should take. Raw probabilities are clamped away from `0` and
 `1`. Specifically, if `p` is the probability mass/density function evaluated at given
 observed ground truth observation `η`, then the score for that example is defined as
@@ -228,6 +228,7 @@ const LogLossType = API.FussyMeasure{<:API.RobustMeasure{<:_LogLossType}}
 @trait(
     _LogLossType,
     consumes_multiple_observations=true,
+    can_report_unaggregated=true,
     kind_of_proxy=LearnAPI.Distribution(),
     # observation_scitype depends on distribution type
     observation_scitype = Union{Missing,Finite,Infinite},
@@ -328,7 +329,7 @@ const BrierScoreDoc = docstring(
     body=
 """
 The score is a mean of observational scores. More generally, observational scores are
-pre-multiplied by the specified weights before avaraging. See below for the form that
+pre-multiplied by the specified weights before averaging. See below for the form that
 probabilistic predictions `ŷ` should take.
 
 Convention as in $PROPER_SCORING_RULES
@@ -398,6 +399,7 @@ const BrierLossType = API.FussyMeasure{<:API.RobustMeasure{<:_BrierLossType}}
 @trait(
     _BrierLossType,
     consumes_multiple_observations=true,
+    can_report_unaggregated=true,
     kind_of_proxy=LearnAPI.Distribution(),
     # observation_scitype depends on distribution type
     observation_scitype = Union{Missing,Finite,Infinite},
@@ -513,7 +515,7 @@ const SphericalScoreDoc = docstring(
     body=
 """
 The score is a mean of observational scores. More generally, observational scores are
-pre-multiplied by the specified weights before avaraging. See below for the form that
+pre-multiplied by the specified weights before averaging. See below for the form that
 probabilistic predictions `ŷ` should take.
 
 Convention as in $PROPER_SCORING_RULES: If `y` takes on a finite

@@ -185,8 +185,8 @@ ordered confusion matrices, see [`$CM.confmat`](@ref).
 
 """
 struct ConfusionMatrix{N,O,L}
-    mat::Matrix{Int}
-    index_given_level::LittleDict{L, Int, NTuple{N,L}, NTuple{N,Int}}
+    mat::Matrix{<:Integer}
+    index_given_level::LittleDict{L, I, NTuple{N,L}, NTuple{N,I}} where I<:Integer
 end
 
 """
@@ -204,14 +204,13 @@ See also [`$CM.confmat`](@ref).
 """
 function ConfusionMatrix(
     m,
-    dic::AbstractDict{L,I};
+    dic::LittleDict{L, I, NTuple{N,L}, NTuple{N,I}};
     checks=true,
     ordered=false,
-    ) where {L,I<:Integer}
-    s = size(m)
-    N = s[1]
+    ) where {L,I<:Integer,N}
     if checks
-        N == s[2] || throw(ArgumentError("Expected a square matrix."))
+        s = size(m)
+        N == s[1] == s[2] || throw(ArgumentError("Expected a square matrix."))
         N > 1 || throw(ArgumentError("Expected a matrix of size ≥ 2x2."))
         length(unique(keys(dic))) == N || throw(ArgumentError(
         "Expected dictionary with $N unique keys (levels) as "*
@@ -222,8 +221,15 @@ function ConfusionMatrix(
             "to be integers from 1 to $N. "
         ))
     end
-    index_given_level = freeze(dic)
-    ConfusionMatrix{N,ordered,L}(m, index_given_level)
+    ConfusionMatrix{N,ordered,L}(m, dic)
+end
+function ConfusionMatrix(
+    m,
+    dic::AbstractDict;
+    checks=true,
+    ordered=false,
+    ) 
+    ConfusionMatrix(m, freeze(dic); checks, ordered)
 end
 
 """
@@ -251,7 +257,7 @@ function ConfusionMatrix(m, levels::AbstractVector{L}; ordered=false, checks=tru
         ))
     end
     index_given_level =
-        LittleDict{L, Int, Vector{L}, Vector{Int}}(levels, eachindex(levels)) |> freeze
+        LittleDict{L, Int, Vector{L}, Vector{Int}}(levels, eachindex(levels))
     ConfusionMatrix(m, index_given_level; ordered, checks=false)
 end
 
@@ -489,8 +495,8 @@ function confmat(ŷ, y, _levels, _perm, rev)
     perm = permutation(_perm,  rev, levels)
 
     levels = apply(perm, levels)
-    indexer = LittleDict(levels[i] => i for i in eachindex(levels)) |> freeze
-
+    L = eltype(levels)
+    indexer = LittleDict{L, Int, Vector{L}, Vector{Int}}(levels, eachindex(levels)) |> freeze
     _confmat(ŷ, y, indexer, levels, ordered)
 end
 
@@ -533,16 +539,24 @@ end
 
 
 # ## Final method to do the computation
-
-function _confmat(ŷ, y, indexer, levels, ordered)
+function _confmat(ŷ, y, indexer::F, levels, ordered) where F
     nc = length(levels)
     cmat = zeros(Int, nc, nc)
     @inbounds for i in eachindex(y)
         (ismissing(y[i]) || ismissing(ŷ[i])) && continue
         cmat[get(indexer, ŷ[i]), get(indexer, y[i])] += 1
     end
-    index_given_level = LittleDict(c => get(indexer, c) for c in levels) |> freeze
     return ConfusionMatrix(cmat, levels; ordered, checks=false)
+end
+
+function _confmat(ŷ, y, indexer::AbstractDict{L,I}, levels, ordered) where {L,I<:Integer}
+    nc = length(levels)
+    cmat = zeros(Int, nc, nc)
+    @inbounds for i in eachindex(y)
+        (ismissing(y[i]) || ismissing(ŷ[i])) && continue
+        cmat[get(indexer, ŷ[i]), get(indexer, y[i])] += 1
+    end
+    return ConfusionMatrix(cmat, indexer; ordered, checks=false)
 end
 
 
