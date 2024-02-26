@@ -228,6 +228,7 @@ const LogLossType = API.FussyMeasure{<:API.RobustMeasure{<:_LogLossType}}
 @trait(
     _LogLossType,
     consumes_multiple_observations=true,
+    can_report_unaggregated=true,
     kind_of_proxy=LearnAPI.Distribution(),
     # observation_scitype depends on distribution type
     observation_scitype = Union{Missing,Finite,Infinite},
@@ -398,6 +399,7 @@ const BrierLossType = API.FussyMeasure{<:API.RobustMeasure{<:_BrierLossType}}
 @trait(
     _BrierLossType,
     consumes_multiple_observations=true,
+    can_report_unaggregated=true,
     kind_of_proxy=LearnAPI.Distribution(),
     # observation_scitype depends on distribution type
     observation_scitype = Union{Missing,Finite,Infinite},
