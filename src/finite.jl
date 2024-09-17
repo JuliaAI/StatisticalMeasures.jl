@@ -243,6 +243,13 @@ const multitarget_accuracy = MultitargetAccuracy()
 struct _BalancedAccuracy
     adjusted::Bool
 end
+BalancedAccuracy(adjusted) =
+    _BalancedAccuracy(adjusted) |> robust_measure |> fussy_measure
+BalancedAccuracy(; adjusted=false) = BalancedAccuracy(adjusted)
+
+const BalancedAccuracyType = API.FussyMeasure{
+    <:API.RobustMeasure{<:_BalancedAccuracy}
+}
 
 nlevels(y) = length(unique(skipmissing(y)))
 nlevels(y::CategoricalArrays.CatArrOrSub) = length(CategoricalArrays.levels(y))
@@ -276,14 +283,6 @@ function (m::_BalancedAccuracy)(ŷ, y, weights=nothing)
     score = Accuracy()(ŷ, y, weights, balancing_class_weights)
     return m.adjusted ? adjust_bac(score, nlevels(y)) : score
 end
-
-BalancedAccuracy(adjusted) =
-    _BalancedAccuracy(adjusted) |> robust_measure |> fussy_measure
-BalancedAccuracy(; adjusted=false) = BalancedAccuracy(adjusted)
-
-const BalancedAccuracyType = API.FussyMeasure{
-    <:API.RobustMeasure{<:_BalancedAccuracy}
-}
 
 @fix_show BalancedAccuracy::BalancedAccuracyType
 
