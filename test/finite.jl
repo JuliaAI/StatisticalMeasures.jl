@@ -74,7 +74,7 @@ end
     sk_bacc = 0.17493386243386244 # note: sk-learn reverses ŷ and y
     @test bacc(ŷ, y) ≈ sk_bacc
     sk_adjusted_bacc =  -0.10008818342151675
-    @test BalancedAccuracy(adjusted=true)(ŷ, y) ≈ sk_adjusted_bacc
+    @test BalancedAccuracy(adjusted=true)(ŷ, y) ≈ BalancedAccuracy(adjusted=true)(CM.confmat(ŷ, y)) ≈ sk_adjusted_bacc
     sk_bacc_w = 0.1581913163016446
     @test bacc(ŷ, y, w) ≈ sk_bacc_w
     sk_adjusted_bacc_w = -0.1224115782644738
