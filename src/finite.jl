@@ -247,7 +247,17 @@ end
 nlevels(y) = length(unique(skipmissing(y)))
 nlevels(y::CategoricalArrays.CatArrOrSub) = length(CategoricalArrays.levels(y))
 spread(y) = length(collect(y))/nlevels(y)
+function adjust_bac(score, nlevels)
+    chance = 1 / nlevels
+    score -= chance
+    score /= 1 - chance
+end
 
+# make callable on confusion matrices:
+function (m::BalancedAccuracyType)(cm::ConfusionMatrices.ConfusionMatrix{N}) where N
+    score = ConfusionMatrices.balanced_accuracy(cm)
+    return m.adjusted ? adjust_bac(score, N) : score
+end
 function (m::_BalancedAccuracy)(ŷ, y, weights=nothing)
     # we need `spread` below because of the way `Accuracy` handles class
     # weights (it has aggregation mode `Mean()` but we want `IMean()` here).
@@ -264,12 +274,7 @@ function (m::_BalancedAccuracy)(ŷ, y, weights=nothing)
             freeze
     end
     score = Accuracy()(ŷ, y, weights, balancing_class_weights)
-    if m.adjusted
-        chance = 1 / nlevels(y)
-        score -= chance
-        score /= 1 - chance
-    end
-    return score
+    return m.adjusted ? adjust_bac(score, nlevels(y)) : score
 end
 
 BalancedAccuracy(adjusted) =
