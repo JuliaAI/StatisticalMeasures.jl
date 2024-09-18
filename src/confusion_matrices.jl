@@ -636,6 +636,7 @@ for f in [
     :accuracy,
     :kappa,
     :matthews_correlation,
+    :balanced_accuracy
     ]
     quote
         $f(cm::ConfusionMatrix, args...; kwargs...) =

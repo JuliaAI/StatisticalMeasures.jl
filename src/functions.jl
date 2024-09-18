@@ -193,6 +193,19 @@ end
 """$(docstring("Functions.accuracy", the=true))"""
 accuracy(m) =  sum(diag(m)) / sum(m)
 
+"""$(docstring("Functions.balanced_accuracy", the=true))"""
+function balanced_accuracy(m)
+    # the number of correctly classified observations per class
+    d = diag(m)
+    total = 0.0
+    for i in eachindex(d)
+        # calculate accuracy for each class
+        total += d[i] / sum(view(m, :, i))
+    end
+    # return the averaged accuracy
+    return total/length(d)
+end
+
 """$(docstring("Functions.kappa"))"""
 function kappa(m)
     C = size(m, 1)
