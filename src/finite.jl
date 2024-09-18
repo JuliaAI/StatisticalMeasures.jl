@@ -317,6 +317,8 @@ Setting `adjusted=true` rescales the score in the way prescribed in [L. Mosley
 imbalance problem. PhD thesis, Iowa State University. In the binary case, the adjusted
 balanced accuracy is also known as *Youden’s J statistic*, or *informedness*.
 
+Can also be called on a confusion matrix. See [`ConfusionMatrix`](@ref).
+
 $INVARIANT_LABEL
 """,
 scitype=DOC_FINITE)
