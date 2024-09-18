@@ -243,11 +243,28 @@ const multitarget_accuracy = MultitargetAccuracy()
 struct _BalancedAccuracy
     adjusted::Bool
 end
+BalancedAccuracy(adjusted) =
+    _BalancedAccuracy(adjusted) |> robust_measure |> fussy_measure
+BalancedAccuracy(; adjusted=false) = BalancedAccuracy(adjusted)
+
+const BalancedAccuracyType = API.FussyMeasure{
+    <:API.RobustMeasure{<:_BalancedAccuracy}
+}
 
 nlevels(y) = length(unique(skipmissing(y)))
 nlevels(y::CategoricalArrays.CatArrOrSub) = length(CategoricalArrays.levels(y))
 spread(y) = length(collect(y))/nlevels(y)
+function adjust_bac(score, nlevels)
+    chance = 1 / nlevels
+    score -= chance
+    score /= 1 - chance
+end
 
+# make callable on confusion matrices:
+function (m::BalancedAccuracyType)(cm::ConfusionMatrices.ConfusionMatrix{N}) where N
+    score = ConfusionMatrices.balanced_accuracy(cm)
+    return m.adjusted ? adjust_bac(score, N) : score
+end
 function (m::_BalancedAccuracy)(ŷ, y, weights=nothing)
     # we need `spread` below because of the way `Accuracy` handles class
     # weights (it has aggregation mode `Mean()` but we want `IMean()` here).
@@ -264,21 +281,8 @@ function (m::_BalancedAccuracy)(ŷ, y, weights=nothing)
             freeze
     end
     score = Accuracy()(ŷ, y, weights, balancing_class_weights)
-    if m.adjusted
-        chance = 1 / nlevels(y)
-        score -= chance
-        score /= 1 - chance
-    end
-    return score
+    return m.adjusted ? adjust_bac(score, nlevels(y)) : score
 end
-
-BalancedAccuracy(adjusted) =
-    _BalancedAccuracy(adjusted) |> robust_measure |> fussy_measure
-BalancedAccuracy(; adjusted=false) = BalancedAccuracy(adjusted)
-
-const BalancedAccuracyType = API.FussyMeasure{
-    <:API.RobustMeasure{<:_BalancedAccuracy}
-}
 
 @fix_show BalancedAccuracy::BalancedAccuracyType
 
@@ -312,6 +316,8 @@ Setting `adjusted=true` rescales the score in the way prescribed in [L. Mosley
 (2013)](https://lib.dr.iastate.edu/etd/13537/): A balanced approach to the multi-class
 imbalance problem. PhD thesis, Iowa State University. In the binary case, the adjusted
 balanced accuracy is also known as *Youden’s J statistic*, or *informedness*.
+
+Can also be called on a confusion matrix. See [`ConfusionMatrix`](@ref).
 
 $INVARIANT_LABEL
 """,
