@@ -94,7 +94,7 @@ string.
         page *= "\n## Classification measures (non-probabilistic)\n\n"
         constructors = filter(all_constructors) do c
             traits = traits_given_constructor[c]
-            traits.kind_of_proxy == LearnAPI.LiteralTarget() &&
+            traits.kind_of_proxy == LearnAPI.Point() &&
                 traits.observation_scitype <: Union{
                     Union{Missing,Finite},
                     AbstractArray{<:Union{Missing,Finite}},
@@ -104,7 +104,7 @@ string.
         page *= "\n## Regression measures (non-probabilistic)\n\n"
         constructors = filter(all_constructors) do c
             traits = traits_given_constructor[c]
-            traits.kind_of_proxy == LearnAPI.LiteralTarget() &&
+            traits.kind_of_proxy == LearnAPI.Point() &&
                 traits.observation_scitype <: Union{
                     Union{Missing,Infinite},
                     AbstractArray{<:Union{Missing,Infinite}},

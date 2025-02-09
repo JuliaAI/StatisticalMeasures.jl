@@ -1,6 +1,6 @@
 # This section is for measures that take `Infinite` input (vectors, arrays or tables)
 # and where the prediction has the same form as the ground truth, i.e.,`kind_of_proxy =
-# LearnAPI.LiteralTarget` (in particular, is not a probabilistic prediction).
+# LearnAPI.Point` (in particular, is not a probabilistic prediction).
 
 # If a new measure can be derived from a single scalar function with zero or one
 # parameters, then follow the examples that use the `@combination` macro. Otherwise you
@@ -12,7 +12,7 @@
 # defines LPLoss and MultitargetLPLoss constructors:
 @combination(
     LPLoss(; p=2) = multimeasure(Functions.pth_power_of_absolute_difference, mode=Mean()),
-    kind_of_proxy = LearnAPI.LiteralTarget(),
+    kind_of_proxy = LearnAPI.Point(),
     observation_scitype = Infinite,
     orientation = Loss(),
     human_name = "``L^p`` loss",
@@ -99,7 +99,7 @@ const multitarget_mean_absolute_value = multitarget_l1
 @combination(
     LPSumLoss(; p=2) =
         multimeasure(Functions.pth_power_of_absolute_difference, mode=Sum()),
-    kind_of_proxy = LearnAPI.LiteralTarget(),
+    kind_of_proxy = LearnAPI.Point(),
     observation_scitype = Infinite,
     orientation = Loss(),
     human_name = "``L^p`` sum loss",
@@ -158,7 +158,7 @@ const multitarget_l2_sum = MultitargetLPSumLoss(2)
 # define constructors:
 @combination(
     RootMeanSquaredError() = multimeasure(Functions.absolute_difference, mode=RootMean()),
-    kind_of_proxy = LearnAPI.LiteralTarget(),
+    kind_of_proxy = LearnAPI.Point(),
     observation_scitype = Infinite,
     orientation = Loss(),
 )
@@ -220,7 +220,7 @@ const multitarget_root_mean_squared_error = multitarget_rms
 @combination(
 RootMeanSquaredLogError() =
     multimeasure(Functions.absolute_difference_of_logs, mode=RootMean()),
-    kind_of_proxy = LearnAPI.LiteralTarget(),
+    kind_of_proxy = LearnAPI.Point(),
     observation_scitype = Infinite,
     orientation = Loss(),
 )
@@ -285,7 +285,7 @@ const multitarget_root_mean_squared_log_error = multitarget_rmsl
 @combination(
     RootMeanSquaredLogProportionalError(; offset=1) =
         multimeasure(Functions.absolute_difference_of_logs, mode=RootMean()),
-    kind_of_proxy = LearnAPI.LiteralTarget(),
+    kind_of_proxy = LearnAPI.Point(),
     observation_scitype = Infinite,
     orientation = Loss(),
 )
@@ -337,7 +337,7 @@ const multitarget_rmslp1 = MultitargetRootMeanSquaredLogProportionalError()
 @combination(
     RootMeanSquaredProportionalError(; tol=eps()) =
         multimeasure(Functions.normalized_absolute_difference, mode=RootMean()),
-    kind_of_proxy = LearnAPI.LiteralTarget(),
+    kind_of_proxy = LearnAPI.Point(),
     observation_scitype = Infinite,
     orientation = Loss(),
 )
@@ -390,7 +390,7 @@ const multitarget_rmsp = MultitargetRootMeanSquaredProportionalError()
 @combination(
     MeanAbsoluteProportionalError(; tol=eps()) =
         multimeasure(Functions.normalized_absolute_difference, mode=Mean()),
-    kind_of_proxy = LearnAPI.LiteralTarget(),
+    kind_of_proxy = LearnAPI.Point(),
     observation_scitype = Infinite,
     orientation = Loss(),
 )
@@ -440,7 +440,7 @@ const multitarget_mape = MultitargetMeanAbsoluteProportionalError()
 # define constructors:
 @combination(
     LogCoshLoss() = multimeasure(Functions.log_cosh_difference, mode=Mean()),
-    kind_of_proxy = LearnAPI.LiteralTarget(),
+    kind_of_proxy = LearnAPI.Point(),
     observation_scitype = Infinite,
     orientation = Loss(),
 )
@@ -512,7 +512,7 @@ const RSquaredType = API.FussyMeasure{<:API.RobustMeasure{<:_RSquared}}
 @trait(
     _RSquared,
     consumes_multiple_observations = true,
-    kind_of_proxy = LearnAPI.LiteralTarget(),
+    kind_of_proxy = LearnAPI.Point(),
     observation_scitype = Union{Missing,Infinite},
     orientation = Score(),
     human_name = "R² coefficient",
