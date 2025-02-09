@@ -208,7 +208,7 @@ end
     for m in (accuracy, recall, StatisticalMeasures.precision, f1score, specificity)
         @test API.consumes_multiple_observations(m)
         m == accuracy || @test !API.can_report_unaggregated(m)
-        @test API.kind_of_proxy(m) == StatisticalMeasures.LearnAPI.LiteralTarget()
+        @test API.kind_of_proxy(m) == StatisticalMeasures.LearnAPI.Point()
         @test API.observation_scitype(m) <: Union{Missing,Finite}
         @test !API.can_consume_tables(m)
         m == accuracy && @test API.supports_weights(m)
@@ -409,7 +409,7 @@ end
         m == MulticlassTrueNegativeRate &&
             (@test API.human_name(m) == "multi-class true negative rate")
         @test API.observation_scitype(m) <: Union{Missing,Finite}
-        @test API.kind_of_proxy(m) == StatisticalMeasures.LearnAPI.LiteralTarget()
+        @test API.kind_of_proxy(m) == StatisticalMeasures.LearnAPI.Point()
         @test API.orientation(m) == API.Score()
         @test API.can_report_unaggregated(m) == false
         @test !API.supports_weights(m)

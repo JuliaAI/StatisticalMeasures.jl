@@ -35,7 +35,7 @@ loss(measure) = measure
 
 @trait(
     S{<:DistanceLoss},
-    kind_of_proxy=LearnAPI.LiteralTarget(),
+    kind_of_proxy=LearnAPI.Point(),
     orientation=Loss(),
     external_aggregation_mode = Mean(),
 )
