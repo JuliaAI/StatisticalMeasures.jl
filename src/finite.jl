@@ -41,7 +41,7 @@ const ConfusionMatrixType = API.FussyMeasure{
 @trait(
     _ConfusionMatrix,
     consumes_multiple_observations=true,
-    kind_of_proxy=LearnAPI.LiteralTarget(),
+    kind_of_proxy=LearnAPI.Point(),
     observation_scitype=Union{Missing,Finite},
     orientation=Unoriented(),
     external_aggregation_mode=Sum(),
@@ -111,7 +111,7 @@ const confusion_matrix =  confmat
 # define both constructors:
 @combination(
     MisclassificationRate() = multimeasure(!=),
-    kind_of_proxy=LearnAPI.LiteralTarget(),
+    kind_of_proxy=LearnAPI.Point(),
     observation_scitype=Finite,
     orientation=Loss(),
 )
@@ -181,7 +181,7 @@ const multitarget_mcr = multitarget_misclassification_rate
 # define both constructors:
 @combination(
     Accuracy() = multimeasure(==),
-    kind_of_proxy=LearnAPI.LiteralTarget(),
+    kind_of_proxy=LearnAPI.Point(),
     observation_scitype=Finite,
     orientation=Score(),
 )
@@ -290,7 +290,7 @@ end
 @trait(
     _BalancedAccuracy,
     consumes_multiple_observations=true,
-    kind_of_proxy=LearnAPI.LiteralTarget(),
+    kind_of_proxy=LearnAPI.Point(),
     observation_scitype=Union{Missing,Finite},
     supports_weights=true,
     orientation=Score(),
@@ -357,7 +357,7 @@ const KappaType = API.FussyMeasure{<:API.RobustMeasure{<:_Kappa}}
 @trait(
     _Kappa,
     consumes_multiple_observations=true,
-    kind_of_proxy=LearnAPI.LiteralTarget(),
+    kind_of_proxy=LearnAPI.Point(),
     observation_scitype=Union{Missing,Finite},
     supports_weights=true,
     orientation=Score(),
@@ -415,7 +415,7 @@ const MatthewsCorrelationType = API.FussyMeasure{
 @trait(
     _MatthewsCorrelation,
     consumes_multiple_observations=true,
-    kind_of_proxy=LearnAPI.LiteralTarget(),
+    kind_of_proxy=LearnAPI.Point(),
     observation_scitype=Union{Missing,Finite},
     orientation=Score(),
     human_name = "Matthew's correlation",
@@ -518,7 +518,7 @@ const FScoreType = API.FussyMeasure{<:API.RobustMeasure{<:_FScore}}
 @trait(
     _FScore,
     consumes_multiple_observations=true,
-    kind_of_proxy=LearnAPI.LiteralTarget(),
+    kind_of_proxy=LearnAPI.Point(),
     observation_scitype=Union{Missing,OrderedFactor{2}},
     orientation=Score(),
     human_name = "``F_β`` score",
@@ -707,7 +707,7 @@ for Measure in TRUE_POSITIVE_AND_COUSINS
             @trait(
                 $_Measure,
                 consumes_multiple_observations=true,
-                kind_of_proxy=LearnAPI.LiteralTarget(),
+                kind_of_proxy=LearnAPI.Point(),
                 observation_scitype=Union{Missing,OrderedFactor{2}},
                 orientation=$orientation,
                 human_name=$name,
@@ -865,7 +865,7 @@ for Measure in [
             @trait(
                 $_Measure,
                 consumes_multiple_observations=true,
-                kind_of_proxy=LearnAPI.LiteralTarget(),
+                kind_of_proxy=LearnAPI.Point(),
                 observation_scitype=Union{Missing,Finite},
                 orientation=$orientation,
                 human_name=$name,
@@ -1104,7 +1104,7 @@ for Measure in [
             @trait(
                 $_Measure,
                 consumes_multiple_observations=true,
-                kind_of_proxy=LearnAPI.LiteralTarget(),
+                kind_of_proxy=LearnAPI.Point(),
                 observation_scitype=Union{Missing,Finite},
                 supports_class_weights=true,
                 orientation=$orientation,
@@ -1322,7 +1322,7 @@ MulticlassFScoreType = API.FussyMeasure{
 @trait(
     _MulticlassFScore,
     consumes_multiple_observations=true,
-    kind_of_proxy=LearnAPI.LiteralTarget(),
+    kind_of_proxy=LearnAPI.Point(),
     observation_scitype=Union{Missing,Finite},
     supports_class_weights=true,
     orientation=Score(),

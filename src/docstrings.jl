@@ -115,7 +115,7 @@ function docstring(signature; body="", footer="", scitype="")
         "use the syntax `measurements($m_str, ŷ, y)`. ")
     ret *= "Generally, an observation `obs` in `MLUtils.eachobs(y)` is expected to satisfy "*
         "`ScientificTypes.scitype(obs)<:`$scitype. "
-    # if kind_of_proxy == LearnAPI.LiteralTarget()
+    # if kind_of_proxy == LearnAPI.Point()
     #     ret *= "The same is true for `ŷ`. "
     # else
     #     ret *= "Each observation in `ŷ` should be this kind of proxy for actual "*

@@ -26,7 +26,7 @@ function StatisticalMeasures.measures(yhat, y; trait_filters...)
     filter(measures(; trait_filters...)) do (_, metadata)
         requirement1 = y_scitype <: metadata.observation_scitype
         proxy = metadata.kind_of_proxy
-        requirement2 = if proxy == LearnAPI.LiteralTarget()
+        requirement2 = if proxy == LearnAPI.Point()
             yhat_scitype <: metadata.observation_scitype
         elseif proxy == LearnAPI.Distribution()
             yhat_scitype <: Density{<:y_scitype}
