@@ -530,7 +530,7 @@ const RSquaredDoc = docstring(
 """
 Specifically, return the value of
 
-``1 - \\frac{∑ᵢ (ŷ_i- y_i)^2}{∑ᵢ ȳ - y_i)^2},``
+``1 - \\frac{∑ᵢ (ŷ_i- y_i)^2}{∑ᵢ (ȳ - y_i)^2}``
 
 where ``ȳ`` denote the mean of the ``y_i``. Also known as R-squared or the coefficient
 of determination, the `R²` coefficients is suitable for interpreting linear regression
