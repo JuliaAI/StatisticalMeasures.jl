@@ -60,9 +60,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
-      - run: |
-          julia --project=docs -e '
-            using Documenter: DocMeta, doctest
-            using StatisticalMeasures
-            DocMeta.setdocmeta!(StatisticalMeasures, :DocTestSetup, :(using StatisticalMeasures); recursive=true)
-            doctest(StatisticalMeasures)'
+      - name: Run doctests
+        run: |
+          using Documenter: DocMeta, doctest
+          using StatisticalMeasures
+          DocMeta.setdocmeta!(StatisticalMeasures, :DocTestSetup, :(using StatisticalMeasures); recursive=true)
+          doctest(StatisticalMeasures)
+        shell: julia --project=docs --color=yes {0}
