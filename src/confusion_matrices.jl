@@ -364,11 +364,8 @@ end
 
 # ## Some helpers
 
-function combined_levels(ŷ, y)
-    unsorted = Set(skipmissing(y))
-    union!(unsorted, skipmissing(ŷ))
-    sort(collect(unsorted))
-end
+combined_levels(ŷ, y) = vcat(levels(ŷ), levels(y)) |> unique |> sort
+
 
 """
     permutation(perm, rev, levels)

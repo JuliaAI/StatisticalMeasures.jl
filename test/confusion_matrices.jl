@@ -168,4 +168,15 @@ end
     @test cm2[2,1] == cm[1,2]
 end
 
+@testset "corner case " begin
+    y1 = categorical([collect("npnp")..., missing])
+    y2 = categorical([collect("nppn")..., missing], compress=true)
+    # set invalid levels:
+    cm = ConfusionMatrix(levels=[1, 2])
+    @test_throws(
+       StatisticalMeasures.ConfusionMatrices. ERR_ORPHANED_OBSERVATIONS,
+       cm(y1, y2),
+    )
+end
+
 true
