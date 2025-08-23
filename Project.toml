@@ -27,7 +27,7 @@ ScientificTypesExt = "ScientificTypes"
 
 [compat]
 CategoricalArrays = "0.10"
-CategoricalDistributions = "0.1"
+CategoricalDistributions = "0.1, 0.2"
 Distributions = "0.25"
 LearnAPI = "0.2, 1"
 LossFunctions = "0.10, 0.11, 1"
