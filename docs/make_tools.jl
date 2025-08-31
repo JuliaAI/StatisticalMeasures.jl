@@ -74,9 +74,9 @@ consume (given by the value of the trait,
 
 Measures are not strict about data conforming to the declared observation scitype. For
 example, where `OrderedFactor{2}` is expected, `Finite{2}` will work, and in fact most
-eltypes will work, so long as there are only two classes. However, you may get warnings
-that mitigate possible misinterpretations of results (e.g., about which class is the
-"positive" one). Some warnings can be suppressed by explicitly specifying measure
+eltypes will work, so long as there are only two classes (levels). However, you may get
+warnings that mitigate possible misinterpretations of results (e.g., about which class is
+the "positive" one). Some warnings can be suppressed by explicitly specifying measure
 parameters, such as `levels`.
 
 To be 100% safe and avoid warnings, use data with the recommended observation scitype.

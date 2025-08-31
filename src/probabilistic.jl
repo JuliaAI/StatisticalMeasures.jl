@@ -60,7 +60,7 @@ struct _AreaUnderCurve  end
 function (::_AreaUnderCurve)(ŷ::AbstractArray{<:UnivariateFinite}, y)
 
     # actually this choice theoretically does not matter:
-    positive_class = CategoricalDistributions.classes(first(ŷ))|> last
+    positive_class = CategoricalArrays.levels(first(ŷ))|> last
     scores = pdf.(ŷ, positive_class)
 
     return Functions.auc(scores, y, positive_class)
@@ -263,7 +263,7 @@ struct BrierScoreOnScalars  end
 
 # finite case:
 @inline function (measure::BrierScoreOnScalars)(ŷ::UnivariateFinite, y)
-    levels = CategoricalDistributions.classes(ŷ)
+    levels = CategoricalArrays.levels(ŷ)
     pvec = broadcast(pdf, ŷ, levels)
     offset = 1 + sum(pvec.^2)
     return 2 * pdf(ŷ, y) - offset
@@ -286,7 +286,7 @@ function (measure::_BrierScoreType)(
     y::NonMissingCatArrOrSub,
     weight_args...,
     )
-    probs = pdf(ŷ, CategoricalDistributions.classes(first(ŷ)))
+    probs = pdf(ŷ, CategoricalArrays.levels(first(ŷ)))
     offset = 1 .+ vec(sum(probs.^2, dims=2))
     unweighted = 2 .* broadcast(pdf, ŷ, y) .- offset
     aggregate(unweighted, weights = API.CompositeWeights(y, weight_args...))
@@ -297,7 +297,7 @@ function API.measurements(
     y::NonMissingCatArrOrSub,
     weight_args...,
     )
-    probs = pdf(ŷ, CategoricalDistributions.classes(first(ŷ)))
+    probs = pdf(ŷ, CategoricalArrays.levels(first(ŷ)))
     offset = 1 .+ vec(sum(probs.^2, dims=2))
     unweighted = 2 .* broadcast(pdf, ŷ, y) .- offset
     API.weighted(unweighted, weights = API.CompositeWeights(y, weight_args...))
@@ -440,7 +440,7 @@ end
     y,
     )
     α = measure.alpha
-    levels = CategoricalDistributions.classes(ŷ)
+    levels = CategoricalArrays.levels(ŷ)
     probs = broadcast(pdf, ŷ, levels)
     return (pdf(ŷ, y)/norm(probs, α))^(α - 1)
 end
@@ -465,7 +465,7 @@ _norm(A::AbstractArray{<:Any,N}, α) where N =
 function unweighted(measure::_SphericalScoreType, ŷ, y)
     α = measure.alpha
     alphanorm(A) = _norm(A, α)
-    predicted_probs = pdf(ŷ, CategoricalDistributions.classes(first(ŷ)))
+    predicted_probs = pdf(ŷ, CategoricalArrays.levels(first(ŷ)))
     (broadcast(pdf, ŷ, y) ./ alphanorm(predicted_probs)).^(α - 1)
 end
 (measure::_SphericalScoreType)(

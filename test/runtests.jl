@@ -20,6 +20,10 @@ call(m, args...) = m(args...)
 
 srng(n=123) = StableRNG(n)
 
+@testset "tools.jl" begin
+    include("tools.jl")
+end
+
 @testset "functions.jl" begin
     include("functions.jl")
 end

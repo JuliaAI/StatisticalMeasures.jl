@@ -34,8 +34,8 @@
     ŷ2 = UnivariateFinite(y2[1:2], probs, augment=true)
     # check positive class has changed:
     @test levels(y) != levels(y2)
-    @test CategoricalDistributions.classes(ŷ) !=
-        CategoricalDistributions.classes(ŷ2)
+    @test CategoricalArrays.levels(ŷ) !=
+        CategoricalArrays.levels(ŷ2)
     # check probability assignments are not changed:
     @test pdf.(ŷ, "pos") == pdf.(ŷ2, "pos")
     # test auc is the same:
@@ -95,7 +95,7 @@ end
     #    [[.1, .9], [.9, .1], [.8, .2], [.35, .65], [0.2, 0.8], [0.3,0.7]])
     # 0.6130097025803921
     y2 = categorical(["spam", "ham", "ham", "spam", "ham", "ham"])
-    L2 = CategoricalDistributions.classes(y2[1])
+    L2 = CategoricalArrays.levels(y2[1])
     probs = vcat([.1 .9], [.9 .1], [.8 .2], [.35 .65], [0.2 0.8], [0.3 0.7])
     yhat2 = UnivariateFinite(L2, probs)
     y2m = vcat(y2, [missing,])
