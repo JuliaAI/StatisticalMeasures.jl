@@ -228,7 +228,7 @@ function ConfusionMatrix(
     dic::AbstractDict;
     checks=true,
     ordered=false,
-    ) 
+    )
     ConfusionMatrix(m, freeze(dic); checks, ordered)
 end
 
@@ -323,6 +323,12 @@ import Base.(*)
 
 Return the levels associated with the confusion matrix `m`, in the order consistent with
 the regular matrix returned by `$CM.matrix(cm)`.
+
+!!! note New in StatisticalMeasures 0.3
+
+    For confusion matrices constructed using `CategoricalArray`s, a `CategoricalVector` is
+    returned. Previously the levels were unwrapped, to match the old behavior of
+    `CategoricalArrays.levels`.
 
 """
 CategoricalArrays.levels(cm::ConfusionMatrix) =
@@ -568,7 +574,7 @@ function Base.show(stream::IO, m::MIME"text/plain", cm::ConfusionMatrix{N}
     mincw    = ceil(Int, 12/N)
     cw       = max(length(string(maximum(cm.mat))),maximum(length.(labels)),mincw)
     textlim  = 9
-    firstcw  = max(length(string(maximum(cm.mat))),maximum(length.(labels)),textlim)    
+    firstcw  = max(length(string(maximum(cm.mat))),maximum(length.(labels)),textlim)
     totalwidth = firstcw + cw * N + N + 2
     width < totalwidth && (show(stream, m, cm.mat); return)
 

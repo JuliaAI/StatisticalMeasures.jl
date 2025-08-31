@@ -1,4 +1,24 @@
+import StatisticalMeasuresBase as API
+using StatisticalMeasures
+using Test
+using ScientificTypes
+import ScientificTypes as ST
+using Statistics
+using CategoricalArrays
+import StableRNGs.StableRNG
+using MLUtils
+using OrderedCollections
+using CategoricalDistributions
+using LinearAlgebra
+import Distributions
+
 const CM = StatisticalMeasures.ConfusionMatrices
+
+# because tests were developed before measures were required to be directly callable and
+# before `call` was removed from StatisticalMeasuresBase:
+call(m, args...) = m(args...)
+
+srng(n=123) = StableRNG(n)
 
 @testset "constructors, `matrix`, equality, element access, arithmetic" begin
     m = [1 2; 3 4]
@@ -46,7 +66,7 @@ end
     ŷraw = [missing, 'f', 'f', 'm', 'f',     'f', 'n', 'm', 'n', 'm', 'f']
     y = categorical(yraw)
     ŷ = categorical(ŷraw)
-    l = levels(y) # f, m, n
+    l = levels(y) # f, m, n (`CategoricalValue`s)
     cm = CM.confmat(ŷ, y)
     ẑ, z = StatisticalMeasures.StatisticalMeasuresBase.skipinvalid(ŷ, y)
     e(c1, c2) = sum((ẑ .== c1) .& (z .== c2))
@@ -58,7 +78,7 @@ end
     @test cm2 == cm
 
     perm = [3, 1, 2]
-    l2 = l[perm]
+    @test l[perm] == ['n', 'f', 'm']
     cm2 = CM.confmat(ŷ, y; perm=perm)
     @test cm2 == cm
     @test levels(cm2) == l[perm]
@@ -174,7 +194,7 @@ end
     # set invalid levels:
     cm = ConfusionMatrix(levels=[1, 2])
     @test_throws(
-       StatisticalMeasures.ConfusionMatrices. ERR_ORPHANED_OBSERVATIONS,
+       StatisticalMeasures.ConfusionMatrices.ERR_ORPHANED_OBSERVATIONS,
        cm(y1, y2),
     )
 end
