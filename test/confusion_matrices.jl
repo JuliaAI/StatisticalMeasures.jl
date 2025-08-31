@@ -14,12 +14,6 @@ import Distributions
 
 const CM = StatisticalMeasures.ConfusionMatrices
 
-# because tests were developed before measures were required to be directly callable and
-# before `call` was removed from StatisticalMeasuresBase:
-call(m, args...) = m(args...)
-
-srng(n=123) = StableRNG(n)
-
 @testset "constructors, `matrix`, equality, element access, arithmetic" begin
     m = [1 2; 3 4]
     index_given_level = Dict("A" => 1, "B" => 2)

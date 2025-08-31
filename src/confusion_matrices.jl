@@ -15,10 +15,11 @@ const CatArrOrSub{T, N} =
     Union{CategoricalArray{T, N}, SubArray{T, N, <:CategoricalArray}}
 
 function WARN_UNORDERED(levels)
+    raw_levels = CategoricalArrays.unwrap.(levels)
     ret = "Levels not explicitly ordered. "*
-        "Using the order $levels. "
+        "Using the order $raw_levels. "
     if length(levels) == 2
-        ret *= "The \"positive\" level is $(levels[2]). "
+        ret *= "The \"positive\" level is $(raw_levels[2]). "
     end
     ret
 end
@@ -56,7 +57,7 @@ Method is optimized for `CategoricalArray` inputs with `levels` inferred. In tha
 """
 
 const DOC_ROWCOL =
-    "Predicted classes are constant on rows, ground truth "*
+    "Predicted classes (levels) are constant on rows, ground truth "*
     "classes are constant on columns. "
 
 const DOC_EG =
@@ -123,7 +124,7 @@ function DOC_OPTIONS(; binary=false, return_type=false, average=false, beta=fals
 
         - `perm=nothing`: in the general case, a permutation representing a re-ordering of
           `levels` (as inferred or specified); e.g., `perm = [1,3,2]` for data with three
-          classes.
+          classes (levels).
 
         """
     ret *=
@@ -145,7 +146,7 @@ Wrapper type for confusion matrices.
 
 # Type parameters
 
-- `N ≥ 2`: number of levels (classes)
+- `N ≥ 2`: number of  classes (levels)
 
 - `O`: `true` if levels are explicitly understood to be ordered
 
@@ -417,12 +418,6 @@ apply(::Nothing, levels) = levels
 get(f, x) = f(x)
 get(dic::AbstractDict, x) = dic[x]
 
-# `classes(...)` is same as `levels(...)` except it returns `CategoricalValue`s:
-classes(p::CategoricalPool) = [p[i] for i in 1:length(p)]
-classes(x::CategoricalValue) = classes(CategoricalArrays.pool(x))
-classes(v::CategoricalArray) = classes(CategoricalArrays.pool(v))
-classes(v::SubArray{<:Any, <:Any, <:CategoricalArray}) = classes(parent(v))
-
 """
     $CM.confmat(ŷ, y, levels=nothing, rev=false, perm=nothing, checks=true)
 
@@ -511,7 +506,7 @@ function confmat(
     rev::Nothing
     )
 
-    levels = classes(y)
+    levels = CategoricalArrays.levels(y)
     ordered =  isordered(y) && isordered(ŷ) || !all(isnothing.((_levels, _perm, rev)))
 
     indexer = levelcode
@@ -527,7 +522,7 @@ function confmat(
     rev,
     )
 
-    levels = classes(y)
+    levels = CategoricalArrays.levels(y)
     ordered =  isordered(y) && isordered(ŷ) || !all(isnothing.((_levels, _perm, rev)))
 
     # get the actual permutation to be used, or `nothing` if not permuting

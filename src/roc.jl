@@ -7,11 +7,11 @@ const ERR_NEED_CATEGORICAL = ArgumentError(
 )
 
 const ERR_ROC1 = ArgumentError(
-    "probabilistic predictions should be for exactly two classes"
+    "probabilistic predictions should be for exactly two classes (levels)"
 )
 
 const ERR_ROC2 = ArgumentError(
-    "ground truth observations must have exactly two classes in the pool"
+    "ground truth observations must have exactly two classes (levels) in the pool"
 )
 
 # perform some argument checks and return the ordered levels:

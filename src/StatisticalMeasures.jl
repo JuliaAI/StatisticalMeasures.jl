@@ -2,7 +2,7 @@ module StatisticalMeasures
 
 using Statistics
 using MacroTools
-import CategoricalArrays
+using CategoricalArrays
 using CategoricalDistributions
 using OrderedCollections
 using ScientificTypesBase
