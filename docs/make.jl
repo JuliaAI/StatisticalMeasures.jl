@@ -10,14 +10,18 @@ const REPO="github.com/JuliaAI/StatisticalMeasures.jl"
 include("make_tools.jl")
 write_measures_page()
 
-makedocs(;
-         modules=[
-             StatisticalMeasures,
-             StatisticalMeasuresBase,
-             ConfusionMatrices,
-             Functions,
-         ],
-    format=Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true"),
+makedocs(
+    modules=[
+        StatisticalMeasures,
+        StatisticalMeasuresBase,
+        ConfusionMatrices,
+        Functions,
+    ],
+    format=Documenter.HTML(
+        prettyurls = true,
+        collapselevel = 1,
+        size_threshold=1_000_000,
+    ),
     pages=[
         "Overview" => "index.md",
         "Examples of usage" => "examples_of_usage.md",
@@ -27,8 +31,9 @@ makedocs(;
         "Tools" => "tools.md",
         "Reference" => "reference.md",
     ],
-    repo="https://$REPO/blob/{commit}{path}#L{line}",
-    sitename="StatisticalMeasures.jl"
+    repo=Remotes.GitHub("JuliaAI", "StatisticalMeasures.jl"),
+    warnonly = [:cross_references, :missing_docs],
+    sitename="StatisticalMeasures.jl",
 )
 
 deploydocs(
@@ -36,3 +41,4 @@ deploydocs(
     devbranch="dev",
     push_preview=false,
 )
+

@@ -19,7 +19,7 @@ ms = measures(that, t)
 end
 
 y = categorical(rand("ab", n))
-yhat = UnivariateFinite(levels(y), rand(n), augment=true, pool=y)
+yhat = UnivariateFinite(levels(y), rand(n), augment=true)
 ms2 = measures((yhat, y))
 @test all(ms2) do (_, metadata)
     Multiclass{2} <: metadata.observation_scitype &&

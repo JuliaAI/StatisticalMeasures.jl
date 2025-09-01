@@ -34,6 +34,8 @@ snakecase(s::Symbol) = Symbol(snakecase(string(s)))
 """
     check_pools(A::UnivariateFiniteArray, B::CategoricalArrays.CatArrOrSub)
 
+*Private method.*
+
 Check that the class pool of `A` coincides with the class pool of `B`, as sets. If both
 `A` and `B` are ordered, check the pools have the same ordering.
 
@@ -45,8 +47,10 @@ function API.check_pools(
     B::CategoricalArrays.CatArrOrSub,
     )
 
-    classes_a = CategoricalDistributions.classes(A)
-    classes_b = CategoricalDistributions.classes(B)
+    first_nonmissing_index = findfirst(x->!ismissing(x), A)
+    element_of_A = A[first_nonmissing_index]
+    classes_a = CategoricalArrays.levels(element_of_A)
+    classes_b = CategoricalArrays.levels(B)
     if  CategoricalArrays.isordered(A) && CategoricalArrays.isordered(B)
         classes_a == classes_b || throw(API.ERR_POOL_ORDER)
     else
