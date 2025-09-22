@@ -582,7 +582,7 @@ const WillmottDDoc = docstring(
     scitype=DOC_INFINITE,
     body=
 """
-Return Willmott index of agreement (d)
+Returns Willmott index of agreement (d)
 
 ``d = 1 - \\dfrac{\\sum (ŷ_i - y_i)^2}{\\sum (|ŷ_i - \\bar y| + |y_i - \\bar y|)^2}``,
 
