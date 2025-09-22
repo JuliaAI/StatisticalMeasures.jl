@@ -50,10 +50,10 @@ Random.seed!()
 y = rand(&quot;ABC&quot;, 1000) |&gt; categorical
 ŷ = rand(&quot;ABC&quot;, 1000) |&gt; categorical
 class_weights = Dict(&#39;A&#39; =&gt; 1, &#39;B&#39; =&gt;2, &#39;C&#39; =&gt; 10)
-MulticlassFScore(beta=0.5, average=MacroAvg())(ŷ, y,  class_weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1.3639036276059306</code></pre><pre><code class="language-julia hljs">MulticlassFScore(beta=0.5, average=NoAvg())(ŷ, y,  class_weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">LittleDict{CategoricalArrays.CategoricalValue{Char, UInt32}, Float64, Tuple{CategoricalArrays.CategoricalValue{Char, UInt32}, CategoricalArrays.CategoricalValue{Char, UInt32}, CategoricalArrays.CategoricalValue{Char, UInt32}}, Tuple{Float64, Float64, Float64}} with 3 entries:
-  &#39;A&#39; =&gt; 0.3125
-  &#39;B&#39; =&gt; 0.697816
-  &#39;C&#39; =&gt; 3.0814</code></pre><p>Unseen classes are tracked, when using <code>CategoricalArrays</code>, as here:</p><pre><code class="language-julia hljs"># find &#39;C&#39;-free indices
+MulticlassFScore(beta=0.5, average=MacroAvg())(ŷ, y,  class_weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1.403740884019081</code></pre><pre><code class="language-julia hljs">MulticlassFScore(beta=0.5, average=NoAvg())(ŷ, y,  class_weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">LittleDict{CategoricalArrays.CategoricalValue{Char, UInt32}, Float64, Tuple{CategoricalArrays.CategoricalValue{Char, UInt32}, CategoricalArrays.CategoricalValue{Char, UInt32}, CategoricalArrays.CategoricalValue{Char, UInt32}}, Tuple{Float64, Float64, Float64}} with 3 entries:
+  &#39;A&#39; =&gt; 0.302752
+  &#39;B&#39; =&gt; 0.695027
+  &#39;C&#39; =&gt; 3.21344</code></pre><p>Unseen classes are tracked, when using <code>CategoricalArrays</code>, as here:</p><pre><code class="language-julia hljs"># find &#39;C&#39;-free indices
 mask = y .!= &#39;C&#39; .&amp;&amp; ŷ .!= &#39;C&#39;;
 # remove observations with &#39;C&#39; class::
 y = y[mask]
@@ -63,9 +63,9 @@ ŷ = ŷ[mask]
 ┌─────────┼────┬────┬────┤
 │Predicted│ A  │ B  │ C  │
 ├─────────┼────┼────┼────┤
-│    A    │102 │105 │ 0  │
+│    A    │ 99 │113 │ 0  │
 ├─────────┼────┼────┼────┤
-│    B    │ 99 │115 │ 0  │
+│    B    │105 │116 │ 0  │
 ├─────────┼────┼────┼────┤
 │    C    │ 0  │ 0  │ 0  │
 └─────────┴────┴────┴────┘
@@ -131,31 +131,31 @@ seed!()
 
 y = rand(20)
 ŷ = [Normal(rand(), 0.5) for i in 1:20]
-ŷ[1]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Distributions.Normal{Float64}(μ=0.9280574748936818, σ=0.5)</code></pre><pre><code class="language-julia hljs">log_loss(ŷ, y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.536700345296312</code></pre><pre><code class="language-julia hljs">weights = rand(20)
-log_loss(ŷ, y, weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.2814320555740363</code></pre><pre><code class="language-julia hljs">weights = rand(20)
+ŷ[1]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Distributions.Normal{Float64}(μ=0.6760416112174623, σ=0.5)</code></pre><pre><code class="language-julia hljs">log_loss(ŷ, y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.5274106046708487</code></pre><pre><code class="language-julia hljs">weights = rand(20)
+log_loss(ŷ, y, weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.23035335007266244</code></pre><pre><code class="language-julia hljs">weights = rand(20)
 measurements(log_loss, ŷ, y, weights)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">20-element Vector{Float64}:
- 0.4336656128668034
- 0.9254657833360208
- 0.23161215100090993
- 0.23181750017939398
- 0.4470879079316613
- 0.2833375929658901
- 0.1342352253961432
- 0.11475304218077305
- 0.026587200210007395
- 0.1421213674335199
- 0.07036908289735888
- 0.1267305492494195
- 0.092599430584589
- 0.6893157407022286
- 0.20522179328879941
- 0.5150915621298241
- 0.22934877408725005
- 0.16700331252092585
- 0.19866221048894883
- 0.5717202090233656</code></pre><p>An example with <code>Count</code> (integer) data:</p><pre><code class="language-julia hljs">y = rand(1:10, 20)
+ 0.08598372983442924
+ 0.1459889230627991
+ 0.051802805417811806
+ 0.2217504144582199
+ 0.16589868333198188
+ 0.21225942278730364
+ 0.08857294080537546
+ 0.2184684183453816
+ 0.3456516041781843
+ 0.06446747907142204
+ 0.14507425242462074
+ 0.17083022589052202
+ 0.09509955486473907
+ 0.17000915541325654
+ 0.30797703937333987
+ 1.309584977239192
+ 0.3616317504620074
+ 1.52607837927812
+ 0.03684630137545178
+ 0.26453853985068504</code></pre><p>An example with <code>Count</code> (integer) data:</p><pre><code class="language-julia hljs">y = rand(1:10, 20)
 ŷ = [Poisson(10*rand()) for i in 1:20]
-ŷ[1]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Distributions.Poisson{Float64}(λ=7.704581636547667)</code></pre><pre><code class="language-julia hljs">brier_loss(ŷ, y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.033724332070787746</code></pre><h2 id="Custom-multi-target-measures"><a class="docs-heading-anchor" href="#Custom-multi-target-measures">Custom multi-target measures</a><a id="Custom-multi-target-measures-1"></a><a class="docs-heading-anchor-permalink" href="#Custom-multi-target-measures" title="Permalink"></a></h2><p>Here&#39;s an example of constructing a multi-target regression measure, for data with 3 observations of a 2-component target:</p><pre><code class="language-julia hljs">using StatisticalMeasures
+ŷ[1]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Distributions.Poisson{Float64}(λ=7.708073055499032)</code></pre><pre><code class="language-julia hljs">brier_loss(ŷ, y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.04393798725333948</code></pre><h2 id="Custom-multi-target-measures"><a class="docs-heading-anchor" href="#Custom-multi-target-measures">Custom multi-target measures</a><a id="Custom-multi-target-measures-1"></a><a class="docs-heading-anchor-permalink" href="#Custom-multi-target-measures" title="Permalink"></a></h2><p>Here&#39;s an example of constructing a multi-target regression measure, for data with 3 observations of a 2-component target:</p><pre><code class="language-julia hljs">using StatisticalMeasures
 
 # last index is observation index:
 y = [&quot;X&quot; &quot;O&quot; &quot;O&quot;; &quot;O&quot; &quot;X&quot; &quot;X&quot;]
@@ -202,4 +202,4 @@ options = measures(yhat, y, supports_weights=true)</code></pre><pre class="docum
   RootMeanSquaredProportionalError    =&gt; (aliases = (&quot;rmsp&quot;,), consumes_multipl…
   MeanAbsoluteProportionalError       =&gt; (aliases = (&quot;mape&quot;,), consumes_multipl…
   LogCoshLoss                         =&gt; (aliases = (&quot;log_cosh&quot;, &quot;log_cosh_loss…</code></pre><pre><code class="language-julia hljs">options[LPLoss]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(aliases = (&quot;l1&quot;, &quot;l2&quot;, &quot;mae&quot;, &quot;mav&quot;, &quot;mean_absolute_error&quot;, &quot;mean_absolute_value&quot;), consumes_multiple_observations = true, can_report_unaggregated = true, kind_of_proxy = Point(), observation_scitype = Union{Missing, Infinite}, can_consume_tables = false, supports_weights = true, supports_class_weights = true, orientation = Loss(), external_aggregation_mode = Mean(), human_name = &quot;``L^p`` loss&quot;)</code></pre><pre><code class="language-julia hljs">measures(&quot;Matthew&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">LittleDict{Any, Any, Vector{Any}, Vector{Any}} with 1 entry:
-  MatthewsCorrelation =&gt; (aliases = (&quot;matthews_correlation&quot;, &quot;mcc&quot;), consumes_m…</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Overview</a><a class="docs-footer-nextpage" href="../auto_generated_list_of_measures/">The Measures »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Monday 22 September 2025 20:24">Monday 22 September 2025</span>. Using Julia version 1.11.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+  MatthewsCorrelation =&gt; (aliases = (&quot;matthews_correlation&quot;, &quot;mcc&quot;), consumes_m…</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Overview</a><a class="docs-footer-nextpage" href="../auto_generated_list_of_measures/">The Measures »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Monday 22 September 2025 20:25">Monday 22 September 2025</span>. Using Julia version 1.11.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
