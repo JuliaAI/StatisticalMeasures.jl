@@ -589,7 +589,7 @@ Returns Willmott index of agreement (d)
 where ``\\bar y`` is the mean of the targets. The value lies in ``[0,1]`` with higher
 being better.
 
-References: Willmott (1981) https://doi.org/10.1080/02723646.1981.10642213
+References: Willmott [(1981)](https://doi.org/10.1080/02723646.1981.10642213)
 """,
 )
 
