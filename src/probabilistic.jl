@@ -554,7 +554,7 @@ end
 ContinuousBoyceIndex(; kw...) = _ContinuousBoyceIndex(; kw...) |> robust_measure |> fussy_measure
 
 function (m::_ContinuousBoyceIndex)(ŷ::UnivariateFiniteArray, y::NonMissingCatArrOrSub; warn=true)
-    warn && @warn ConfusionMatrices.WARN_UNORDERED(levels(y))
+    warn && warn_unordered(levels(y))
     positive_class = classes(first(ŷ))|> last
     scores = pdf.(ŷ, positive_class)
     ma = isnothing(m.max) ? maximum(scores) : m.max
@@ -597,9 +597,14 @@ function _cbi(scores, y, positive_class, nbins, binwidth, ma, mi, cor)
     deleteat!(n_negative, no_obs)
     binstarts = binstarts[.!no_obs]
 
+    # calculate the relative frequencies of the positive class in each bin
     binmeans = (n_positive ./ tot_positive) ./ (n_negative ./ tot_negative)
     r = cor(binmeans, binstarts)
-    isnan(r) && error()
+    isnan(r) && error(
+        "Could not calculate a correlation coefficient because no bins with at least owned
+        negative and one positive observation. Try decreasing the number of bins or increasing
+        the bin overlap."
+    )
     return r
 end
 
@@ -645,4 +650,4 @@ See also [Boyce Index (Wikipedia)](https://en.wikipedia.org/wiki/Boyce_index).
 "$ContinuousBoyceIndexDoc"
 ContinuousBoyceIndex
 "$ContinuousBoyceIndexDoc"
-const cbi = ContinuousBoyceIndex()
+cbi(x, y; kw...) = ContinuousBoyceIndex(; kw...)(x, y)

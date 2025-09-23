@@ -14,16 +14,6 @@ const CM  = "ConfusionMatrices"
 const CatArrOrSub{T, N} =
     Union{CategoricalArray{T, N}, SubArray{T, N, <:CategoricalArray}}
 
-function WARN_UNORDERED(levels)
-    raw_levels = CategoricalArrays.unwrap.(levels)
-    ret = "Levels not explicitly ordered. "*
-        "Using the order $raw_levels. "
-    if length(levels) == 2
-        ret *= "The \"positive\" level is $(raw_levels[2]). "
-    end
-    ret
-end
-
 const ERR_INDEX_ACCESS_DENIED = ErrorException(
     "Direct access by index of unordered confusion matrices dissallowed. "*
         "Access by level, as in `some_confusion_matrix(\"male\", \"female\")` or first "*
@@ -343,7 +333,7 @@ Return the regular `Matrix` associated with confusion matrix `m`.
 """
 matrix(cm::ConfusionMatrix{N,true}; kwargs...) where N = cm.mat
 @inline function matrix(cm::ConfusionMatrix{N,false}; warn=true) where N
-    warn && @warn WARN_UNORDERED(levels(cm))
+    warn && warn_unordered(levels(cm))
     cm.mat
 end
 

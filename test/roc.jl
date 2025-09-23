@@ -25,7 +25,7 @@
     )
 
     fprs, tprs, ts = @test_logs(
-        (:warn, ConfusionMatrices.WARN_UNORDERED([0, 1])),
+        (:warn, StatisticalMeasures.warn_unordered([0, 1])),
         roc_curve(ŷ, y),
      )
 
