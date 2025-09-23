@@ -179,3 +179,33 @@ end
     s = SphericalScore(alpha=1)
     @test_throws StatisticalMeasures.ERR_UNSUPPORTED_ALPHA s(yhat, [1.0, 1.0])
 end
+
+
+@testset "ContinuousBoyceIndex" begin
+    rng = srng(1234)
+    # Simple synthetic test: perfectly separates positives and negatives
+    c = ["neg", "pos"]
+    probs = repeat(0.0:0.1:0.9, inner = 10) .+ rand(rng, 100) .* 0.1
+    y = categorical(probs .> rand(rng, 100))
+    ŷ = UnivariateFinite(levels(y), probs, augment=true)
+    # Should be pretty high
+    @test cbi(ŷ, y) ≈ 0.84 atol=0.05
+
+    # Randomized test: shuffled labels, should be near 0
+    y_shuf = copy(y)
+    shuffle!(rng, y_shuf)
+    @test (cbi(ŷ, y_shuf)) ≈ 0.0 atol=0.1
+
+    # Test invariance to order
+    idx = randperm(length(y))
+    @test isapprox(cbi(ŷ[idx], y[idx]), cbi(ŷ, y), atol=1e-8)
+
+    # Test with different number of bins
+    @test cbi(ŷ, y; n_bins=5) < cbi(ŷ, y; n_bins=20)
+
+    # Test with all positives or all negatives (should error or return NaN)
+    y_allpos = categorical(trues(100), levels = levels(y))
+    y_allneg = categorical(falses(100), levels = levels(y))
+    @test_throws cbi(ŷ, y_allpos)
+    @test_throws cbi(ŷ, y_allneg)
+end
