@@ -23,10 +23,7 @@ function binary_levels(
     length(classes) == 2 || throw(ERR_ROC2)
     API.check_numobs(yhat, y)
     API.check_pools(yhat, y)
-    if !(yhat isa AbstractArray{<:UnivariateFinite{<:OrderedFactor}}) ||
-        !CategoricalArrays.isordered(y)
-        @warn ConfusionMatrices.WARN_UNORDERED(classes)
-    end
+    yhat isa AbstractArray{<:UnivariateFinite{<:OrderedFactor}} && warn_unordered(classes)
     classes
 end
 binary_levels(

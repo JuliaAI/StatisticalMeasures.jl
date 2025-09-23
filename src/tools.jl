@@ -59,3 +59,14 @@ function API.check_pools(
     return nothing
 end
 
+# Throw a warning if levels are not explicitly ordered
+function warn_unordered(levels)
+    CategoricalArrays.isordered(levels) && return
+    raw_levels = CategoricalArrays.unwrap.(levels)
+    ret = "Levels not explicitly ordered. "*
+        "Using the order $raw_levels. "
+    if length(levels) == 2
+        ret *= "The \"positive\" level is $(raw_levels[2]). "
+    end
+    @warn ret
+end
