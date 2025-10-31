@@ -598,7 +598,7 @@ The predictions `ŷ` should be a vector of `UnivariateFinite` distributions fro
 
 Returns the correlation between the ratio of positive to negative samples in each bin and the bin centers.
 
-See also [Boyce Index (Wikipedia)](https://en.wikipedia.org/wiki/Boyce_index).
+Core implementation: [`Functions.cbi`](@ref).
 
 Reference:
 Alexandre H. Hirzel, Gwenaëlle Le Lay, Véronique Helfer, Christophe Randin, Antoine Guisan,
