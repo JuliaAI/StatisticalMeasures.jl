@@ -114,7 +114,7 @@ end
          1, 1, 1, 2, 2, 1, 2, 1, 2, 2, 2, 1, 2,
          1, 2, 2, missing]
 
-    @test_logs (:warn, CM.WARN_UNORDERED([1, 2])) f1score(ŷ, y)
+    @test_logs (:warn, StatisticalMeasures.warn_unordered([1, 2])) f1score(ŷ, y)
     f05 = @test_logs FScore(0.5, levels=[1, 2])(ŷ, y)
     sk_f05 = 0.625
     @test f05 ≈ sk_f05 # m.fbeta_score(y, yhat, 0.5, pos_label=2)

@@ -536,3 +536,80 @@ $DOC_DISTRIBUTIONS
 SphericalScore
 "$SphericalScoreDoc"
 const spherical_score = SphericalScore()
+
+
+# ---------------------------------------------------------------------
+# Continuous Boyce Index
+struct _ContinuousBoyceIndex 
+    nbins::Integer
+    bin_overlap::AbstractFloat
+    min::Union{AbstractFloat, Nothing}
+    max::Union{AbstractFloat, Nothing}
+    cor::Function
+    function _ContinuousBoyceIndex(; nbins = 101, bin_overlap = 0.1, min = nothing, max = nothing, cor = StatsBase.corspearman)
+        new(nbins, bin_overlap, min, max, cor)
+    end
+end
+
+ContinuousBoyceIndex(; kw...) = _ContinuousBoyceIndex(; kw...) |> robust_measure |> fussy_measure
+
+function (m::_ContinuousBoyceIndex)(ŷ::UnivariateFiniteArray, y::NonMissingCatArrOrSub; warn=true)
+    warn && warn_unordered(levels(y))
+    positive_class = classes(first(ŷ))|> last
+    scores = pdf.(ŷ, positive_class)
+    max = isnothing(m.max) ? maximum(scores) : m.max
+    min = isnothing(m.min) ? minimum(scores) : m.min
+    binwidth = m.bin_overlap * (max - min)
+
+    return Functions.cbi(scores, y, positive_class; nbins = m.nbins, binwidth, max, min, cor = m.cor)
+end
+
+const ContinuousBoyceIndexType = API.FussyMeasure{<:API.RobustMeasure{<:_ContinuousBoyceIndex}}
+
+@fix_show ContinuousBoyceIndex::ContinuousBoyceIndexType
+
+StatisticalMeasures.@trait(
+    _ContinuousBoyceIndex,
+    consumes_multiple_observations=true,
+    observation_scitype = Finite{2},
+    kind_of_proxy=StatisticalMeasures.LearnAPI.Distribution(),
+    orientation=Score(),
+    external_aggregation_mode=Mean(),
+    human_name = "continuous boyce index",
+)
+
+register(ContinuousBoyceIndex, "continuous_boyce_index", "cbi")
+
+const ContinuousBoyceIndexDoc = docstring(
+    "ContinuousBoyceIndex(; nbins=101, bin_overlap=0.1, min=nothing, max=nothing, cor=StatsBase.corspearman)",
+    body=
+"""
+The Continuous Boyce Index is a measure for evaluating the performance of probabilistic predictions for binary classification, 
+especially for presence-background data in ecological modeling. 
+It compares the predicted probability scores for the positive class across bins, giving higher scores if the ratio of positive
+    and negative samples in each bin is strongly correlated to the value at that bin.
+
+- `nbins`: Number of bins to use for score partitioning.
+- `bin_overlap`: Fractional overlap between bins.
+- `min`, `max`: Optional minimum and maximum score values for binning.
+- `cor`: Correlation function (default: Spearman correlation).
+
+The predictions `ŷ` should be a vector of `UnivariateFinite` distributions from CategoricalDistributions.jl, and `y` a vector of ground truth labels.
+
+Returns the correlation between the ratio of positive to negative samples in each bin and the bin centers.
+
+Core implementation: [`Functions.cbi`](@ref).
+
+Reference:
+Alexandre H. Hirzel, Gwenaëlle Le Lay, Véronique Helfer, Christophe Randin, Antoine Guisan,
+Evaluating the ability of habitat suitability models to predict species presences,
+Ecological Modelling,
+Volume 199, Issue 2, 2006
+""",
+    scitype="",
+)
+
+"$ContinuousBoyceIndexDoc"
+ContinuousBoyceIndex
+"$ContinuousBoyceIndexDoc"
+const cbi(x, y) = ContinuousBoyceIndex()(x, y)
