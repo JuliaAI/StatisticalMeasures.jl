@@ -23,7 +23,7 @@ function binary_levels(
     length(classes) == 2 || throw(ERR_ROC2)
     API.check_numobs(yhat, y)
     API.check_pools(yhat, y)
-    yhat isa AbstractArray{<:UnivariateFinite{<:OrderedFactor}} && warn_unordered(classes)
+    warn_unordered(classes)
     classes
 end
 binary_levels(
