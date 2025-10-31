@@ -9,6 +9,7 @@ module ConfusionMatrices
 using CategoricalArrays
 using OrderedCollections
 import ..Functions
+import ..warn_unordered
 
 const CM  = "ConfusionMatrices"
 const CatArrOrSub{T, N} =

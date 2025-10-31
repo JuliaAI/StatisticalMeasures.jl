@@ -61,7 +61,7 @@ end
 
 # Throw a warning if levels are not explicitly ordered
 function warn_unordered(levels)
-    CategoricalArrays.isordered(levels) && return
+    levels isa CategoricalArray && CategoricalArrays.isordered(levels) && return
     raw_levels = CategoricalArrays.unwrap.(levels)
     ret = "Levels not explicitly ordered. "*
         "Using the order $raw_levels. "
@@ -69,4 +69,5 @@ function warn_unordered(levels)
         ret *= "The \"positive\" level is $(raw_levels[2]). "
     end
     @warn ret
+    return ret
 end
