@@ -541,13 +541,13 @@ const spherical_score = SphericalScore()
 # ---------------------------------------------------------------------
 # Continuous Boyce Index
 struct _ContinuousBoyceIndex 
-    n_bins::Integer
+    nbins::Integer
     bin_overlap::AbstractFloat
     min::Union{AbstractFloat, Nothing}
     max::Union{AbstractFloat, Nothing}
     cor::Function
-    function _ContinuousBoyceIndex(; n_bins = 101, bin_overlap = 0.1, min = nothing, max = nothing, cor = StatsBase.corspearman)
-        new(n_bins, bin_overlap, min, max, cor)
+    function _ContinuousBoyceIndex(; nbins = 101, bin_overlap = 0.1, min = nothing, max = nothing, cor = StatsBase.corspearman)
+        new(nbins, bin_overlap, min, max, cor)
     end
 end
 
@@ -557,55 +557,11 @@ function (m::_ContinuousBoyceIndex)(ŷ::UnivariateFiniteArray, y::NonMissingCat
     warn && warn_unordered(levels(y))
     positive_class = classes(first(ŷ))|> last
     scores = pdf.(ŷ, positive_class)
-    ma = isnothing(m.max) ? maximum(scores) : m.max
-    mi = isnothing(m.min) ? minimum(scores) : m.min
-    binwidth = m.bin_overlap * (ma - mi)
+    max = isnothing(m.max) ? maximum(scores) : m.max
+    min = isnothing(m.min) ? minimum(scores) : m.min
+    binwidth = m.bin_overlap * (max - min)
 
-    return _cbi(scores, y, positive_class, m.n_bins, binwidth, ma, mi, m.cor)
-end
-
-function _cbi(scores, y, positive_class, nbins, binwidth, ma, mi, cor)
-    binstarts = range(mi, stop=ma-binwidth, length=nbins)
-    binends = range(mi + binwidth, stop=ma, length=nbins)
-
-    sorted_indices = sortperm(scores)
-    sorted_scores = view(scores, sorted_indices)
-    sorted_y = view(y, sorted_indices)
-
-    tot_positive = count(==(positive_class), y)
-    tot_negative = length(y) - tot_positive
-
-    n_positive = zeros(Int, nbins)
-    n_negative = zeros(Int, nbins)
-
-    @inbounds for i in 1:nbins
-        bin_index_first = searchsortedfirst(sorted_scores, binstarts[i])
-        bin_index_last = searchsortedlast(sorted_scores, binends[i])
-        @inbounds for j in bin_index_first:bin_index_last
-            if sorted_y[j] == positive_class 
-                n_positive[i] += 1
-            end
-        end
-        n_negative[i] = bin_index_last - bin_index_first + 1 - n_positive[i]
-    end
-
-    n_total = n_positive .+ n_negative
-
-    # omit bins with no negative - we don't want to divide by zero
-    no_obs = n_negative .== 0
-    deleteat!(n_positive, no_obs)
-    deleteat!(n_negative, no_obs)
-    binstarts = binstarts[.!no_obs]
-
-    # calculate the relative frequencies of the positive class in each bin
-    binmeans = (n_positive ./ tot_positive) ./ (n_negative ./ tot_negative)
-    r = cor(binmeans, binstarts)
-    isnan(r) && error(
-        "Could not calculate a correlation coefficient because no bins with at least owned
-        negative and one positive observation. Try decreasing the number of bins or increasing
-        the bin overlap."
-    )
-    return r
+    return Functions.cbi(scores, y, positive_class; nbins = m.nbins, binwidth, max, min, cor = m.cor)
 end
 
 const ContinuousBoyceIndexType = API.FussyMeasure{<:API.RobustMeasure{<:_ContinuousBoyceIndex}}
@@ -625,7 +581,7 @@ StatisticalMeasures.@trait(
 register(ContinuousBoyceIndex, "continuous_boyce_index", "cbi")
 
 const ContinuousBoyceIndexDoc = docstring(
-    "ContinuousBoyceIndex(; n_bins=101, bin_overlap=0.1, min=nothing, max=nothing, cor=StatsBase.corspearman)",
+    "ContinuousBoyceIndex(; nbins=101, bin_overlap=0.1, min=nothing, max=nothing, cor=StatsBase.corspearman)",
     body=
 """
 The Continuous Boyce Index is a measure for evaluating the performance of probabilistic predictions for binary classification, 
@@ -633,7 +589,7 @@ especially for presence-background data in ecological modeling.
 It compares the predicted probability scores for the positive class across bins, giving higher scores if the ratio of positive
     and negative samples in each bin is strongly correlated to the value at that bin.
 
-- `n_bins`: Number of bins to use for score partitioning.
+- `nbins`: Number of bins to use for score partitioning.
 - `bin_overlap`: Fractional overlap between bins.
 - `min`, `max`: Optional minimum and maximum score values for binning.
 - `cor`: Correlation function (default: Spearman correlation).
@@ -643,6 +599,12 @@ The predictions `ŷ` should be a vector of `UnivariateFinite` distributions fro
 Returns the correlation between the ratio of positive to negative samples in each bin and the bin centers.
 
 See also [Boyce Index (Wikipedia)](https://en.wikipedia.org/wiki/Boyce_index).
+
+Reference:
+Alexandre H. Hirzel, Gwenaëlle Le Lay, Véronique Helfer, Christophe Randin, Antoine Guisan,
+Evaluating the ability of habitat suitability models to predict species presences,
+Ecological Modelling,
+Volume 199, Issue 2, 2006
 """,
     scitype="",
 )
@@ -650,4 +612,4 @@ See also [Boyce Index (Wikipedia)](https://en.wikipedia.org/wiki/Boyce_index).
 "$ContinuousBoyceIndexDoc"
 ContinuousBoyceIndex
 "$ContinuousBoyceIndexDoc"
-cbi(x, y; kw...) = ContinuousBoyceIndex(; kw...)(x, y)
+const cbi(x, y) = ContinuousBoyceIndex()(x, y)

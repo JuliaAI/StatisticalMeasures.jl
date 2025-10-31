@@ -180,7 +180,6 @@ end
     @test_throws StatisticalMeasures.ERR_UNSUPPORTED_ALPHA s(yhat, [1.0, 1.0])
 end
 
-
 @testset "ContinuousBoyceIndex" begin
     rng = srng(1234)
     # Simple synthetic test: perfectly separates positives and negatives
@@ -189,7 +188,11 @@ end
     y = categorical(probs .> rand(rng, 100))
     ŷ = UnivariateFinite(levels(y), probs, augment=true)
     # Should be pretty high
-    @test cbi(ŷ, y) ≈ 0.84 atol=0.05
+    @test cbi(ŷ, y) ≈ 0.86 atol=0.01
+
+    # Passing different correlation methods works
+    @test ContinuousBoyceIndex(cor=cor)(ŷ, y) ≈ 0.90 atol = 0.01
+    @test ContinuousBoyceIndex(nbins = 11)(ŷ, y) ≈ 0.83 atol = 0.01 
 
     # Randomized test: shuffled labels, should be near 0
     y_shuf = copy(y)
@@ -200,12 +203,9 @@ end
     idx = randperm(length(y))
     @test isapprox(cbi(ŷ[idx], y[idx]), cbi(ŷ, y), atol=1e-8)
 
-    # Test with different number of bins
-    @test cbi(ŷ, y; n_bins=5) < cbi(ŷ, y; n_bins=20)
-
-    # Test with all positives or all negatives (should error or return NaN)
+    # Test with all positives or all negatives return NaN
     y_allpos = categorical(trues(100), levels = levels(y))
     y_allneg = categorical(falses(100), levels = levels(y))
-    @test_throws cbi(ŷ, y_allpos)
-    @test_throws cbi(ŷ, y_allneg)
+    @test isnan(cbi(ŷ, y_allpos))
+    @test isnan(cbi(ŷ, y_allneg))
 end
