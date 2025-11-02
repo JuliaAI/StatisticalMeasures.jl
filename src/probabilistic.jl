@@ -39,9 +39,15 @@ const ERR_UNSUPPORTED_ALPHA = ArgumentError(
 
 # Extra check for L2 norm based proper scoring rules
 function l2_check(measure, yhat, y, weight_args...)
+
+    # We attempt to extract the type of distribution from the eltype of `yhat` first:
     D = nonmissing(eltype(yhat))
+
+    # It can happen that this won't actually work (e.g., the type is too abstract; see the
+    # `l2_check` tests). So in that case we try to find a non-missing element from which
+    # to extract the type directly:
     D <: Distributions.Distribution || D <: UnivariateFinite ||
-        (D = typeof(findfirst(x->!API.isinvalid(x), yhat)))
+        (D = typeof(first(skipmissing(yhat))))
     D <: Union{Nothing, WITH_L2NORM...} ||
         throw(ERR_L2_NORM)
 

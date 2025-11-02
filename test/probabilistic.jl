@@ -179,3 +179,13 @@ end
     s = SphericalScore(alpha=1)
     @test_throws StatisticalMeasures.ERR_UNSUPPORTED_ALPHA s(yhat, [1.0, 1.0])
 end
+
+@testset "l2_check" begin
+    d = Distributions.Normal()
+    yhat = Union{Distributions.Sampleable,Missing}[d, d, missing]
+    y = ones(3)
+    @test isnothing(StatisticalMeasures.l2_check("dummy", yhat, y))
+    @test isnothing(StatisticalMeasures.l2_check("dummy", UnivariateFinite[], Float64[]))
+end
+
+true
