@@ -11,7 +11,7 @@ using OrderedCollections
 using CategoricalDistributions
 using LinearAlgebra
 import Distributions
-import StatsBase: corspearman
+import StatsBase: corspearman, randperm
 
 const CM = ConfusionMatrices
 

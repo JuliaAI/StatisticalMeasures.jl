@@ -196,7 +196,7 @@ end
 
     # Randomized test: shuffled labels, should be near 0
     y_shuf = copy(y)
-    shuffle!(rng, y_shuf)
+    MLUtils.shuffle!(rng, y_shuf)
     @test (cbi(ŷ, y_shuf)) ≈ 0.0 atol=0.1
 
     # Test invariance to order
