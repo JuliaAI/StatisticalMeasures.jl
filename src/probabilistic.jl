@@ -46,8 +46,10 @@ function l2_check(measure, yhat, y, weight_args...)
     # It can happen that this won't actually work (e.g., the type is too abstract; see the
     # `l2_check` tests). So in that case we try to find a non-missing element from which
     # to extract the type directly:
-    D <: Distributions.Distribution || D <: UnivariateFinite ||
-        (D = typeof(first(skipmissing(yhat))))
+    D <: Distributions.Distribution || D <: UnivariateFinite || begin
+        yhat_clean = skipmissing(yhat)
+        D = isempty(yhat_clean) ? Nothing : typeof(first(yhat_clean))
+    end
     D <: Union{Nothing, WITH_L2NORM...} ||
         throw(ERR_L2_NORM)
 
