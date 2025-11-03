@@ -185,7 +185,8 @@ end
     yhat = Union{Distributions.Sampleable,Missing}[d, d, missing]
     y = ones(3)
     @test isnothing(StatisticalMeasures.l2_check("dummy", yhat, y))
-    @test isnothing(StatisticalMeasures.l2_check("dummy", UnivariateFinite[], Float64[]))
+    # empty vector:
+    @test isnothing(StatisticalMeasures.l2_check("dummy", yhat[1:0], Float64[]))
 end
 
 true
