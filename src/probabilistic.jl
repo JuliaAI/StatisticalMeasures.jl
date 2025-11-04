@@ -563,7 +563,7 @@ ContinuousBoyceIndex(; kw...) = _ContinuousBoyceIndex(; kw...) |> robust_measure
 
 function (m::_ContinuousBoyceIndex)(ŷ::UnivariateFiniteArray, y::NonMissingCatArrOrSub; warn=true)
     warn && warn_unordered(levels(y))
-    positive_class = classes(first(ŷ))|> last
+    positive_class = levels(first(ŷ))|> last
     scores = pdf.(ŷ, positive_class)
     max = isnothing(m.max) ? maximum(scores) : m.max
     min = isnothing(m.min) ? minimum(scores) : m.min
