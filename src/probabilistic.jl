@@ -597,10 +597,15 @@ especially for presence-background data in ecological modeling.
 It compares the predicted probability scores for the positive class across bins, giving higher scores if the ratio of positive
     and negative samples in each bin is strongly correlated to the value at that bin.
 
+## Keywords
+
 - `nbins`: Number of bins to use for score partitioning.
-- `bin_overlap`: Fractional overlap between bins.
-- `min`, `max`: Optional minimum and maximum score values for binning.
-- `cor`: Correlation function (default: Spearman correlation).
+- `bin_overlap`: Relative overlap between bins. The actual bin width is `bin_overlap * (max - min)`.
+- `min`, `max`: Optional minimum and maximum score values for binning. Default to the
+    maximum and minimum values of the scores.
+- `cor`: Correlation function (defaults to StatsBase.corspearman, i.e. Spearman correlation).
+
+## Arguments
 
 The predictions `ŷ` should be a vector of `UnivariateFinite` distributions from CategoricalDistributions.jl, and `y` a vector of ground truth labels.
 
