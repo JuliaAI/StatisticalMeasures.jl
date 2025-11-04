@@ -289,12 +289,12 @@ function cbi(
         n_total[i] = bin_index_last - bin_index_first + 1
     end
     if any_empty
-        @info "removing $(length(empty_bins)) bins without any observations"
+        @info "removing $(sum(empty_bins)) bins without any observations"
         deleteat!(n_positive, empty_bins)
         deleteat!(n_total, empty_bins)
         binstarts = binstarts[.!empty_bins]
     end
-    
+
     # calculate "PE-ratios" - a bunch of things cancel out but that does not matter for
     # any correlation calculation
     PE_ratios = n_positive ./ n_total
