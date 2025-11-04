@@ -208,4 +208,15 @@ end
     y_allneg = categorical(falses(100), levels = levels(y))
     @test isnan(cbi(ŷ, y_allpos))
     @test isnan(cbi(ŷ, y_allneg))
+
+    unordered_warning = StatisticalMeasures.warn_unordered([false, true])
+    @test_logs(
+        (:warn, unordered_warning),
+        cbi(ŷ, y),
+     )
+
+    @test_logs(
+        (:warn, unordered_warning), (:info, "removing 101 bins without any observations",),
+        ContinuousBoyceIndex(; max = 2.0)(ŷ, y),
+     )
 end
