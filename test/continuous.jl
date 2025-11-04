@@ -31,6 +31,16 @@ rng = srng(666899)
     yhat = rand(rng, 4)
     @test isapprox(log_cosh(yhat, y), mean(log.(cosh.(yhat - y))))
     @test rsq(yhat, y) == 1 - sum((yhat - y).^2)/sum((y .- mean(y)).^2)
+    let
+        num = sum((yhat - y).^2)
+        den = sum((abs.(yhat .- mean(y)) .+ abs.(y .- mean(y))).^2)
+        @test isapprox(willmott_d(yhat, y), den == 0 ? (num == 0 ? 1.0 : 0.0) : 1 - num/den)
+        # additional tests for willmott_d
+        @test willmott_d(yhat, yhat) == 1
+        @test willmott_d(y, y) == 1
+        @test willmott_d(yhat .+ 1, zeros(length(yhat))) == 0  # yhat .+ 1 ensures it's not all zeros
+        @test willmott_d(zeros(4), zeros(4)) == 1
+    end
 
     # a multi-target test where there is a parameter:
     y   = rand(rng, 2, 10)

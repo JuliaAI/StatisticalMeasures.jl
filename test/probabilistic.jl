@@ -220,3 +220,14 @@ end
         ContinuousBoyceIndex(; max = 2.0)(ŷ, y),
      )
 end
+
+@testset "l2_check" begin
+    d = Distributions.Normal()
+    yhat = Union{Distributions.Sampleable,Missing}[d, d, missing]
+    y = ones(3)
+    @test isnothing(StatisticalMeasures.l2_check("dummy", yhat, y))
+    # empty vector:
+    @test isnothing(StatisticalMeasures.l2_check("dummy", yhat[1:0], Float64[]))
+end
+
+true
