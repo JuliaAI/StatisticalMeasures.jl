@@ -625,4 +625,6 @@ Volume 199, Issue 2, 2006
 "$ContinuousBoyceIndexDoc"
 ContinuousBoyceIndex
 "$ContinuousBoyceIndexDoc"
-const cbi(x, y) = ContinuousBoyceIndex()(x, y)
+const cbi = ContinuousBoyceIndex()
+"$ContinuousBoyceIndexDoc"
+const continuous_boyce_index = ContinuousBoyceIndex()
