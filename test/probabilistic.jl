@@ -215,10 +215,13 @@ end
         cbi(ŷ, y),
      )
 
-    @test_logs(
-        (:warn, unordered_warning), (:info, "removing 101 bins without any observations",),
-        ContinuousBoyceIndex(; max = 2.0)(ŷ, y),
-     )
+    cbi_dropped_bins = @test_logs(
+        (:warn, unordered_warning), (:info, "removing 91 bins without any observations",),
+        ContinuousBoyceIndex(; min =0.0, max = 2.0, nbins = 191, bin_overlap = 0.05)(ŷ, y),
+    )
+    # These two are identical because bins are dropped
+    @test cbi_dropped_bins == 
+        ContinuousBoyceIndex(; min = 0.0, max = 1.2, nbins = 111, bin_overlap = 0.1/1.2)(ŷ, y)
 end
 
 @testset "l2_check" begin
