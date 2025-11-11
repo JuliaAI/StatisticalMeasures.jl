@@ -561,7 +561,7 @@ end
 
 ContinuousBoyceIndex(; kw...) = _ContinuousBoyceIndex(; kw...) |> robust_measure |> fussy_measure
 
-function (m::_ContinuousBoyceIndex)(ŷ::UnivariateFiniteArray, y::NonMissingCatArrOrSub; warn=true)
+function (m::_ContinuousBoyceIndex)(ŷ::AbstractArray{<:UnivariateFinite}, y::NonMissingCatArrOrSub; warn=true)
     warn && warn_unordered(levels(y))
     positive_class = levels(first(ŷ))|> last
     scores = pdf.(ŷ, positive_class)
@@ -583,7 +583,7 @@ StatisticalMeasures.@trait(
     kind_of_proxy=StatisticalMeasures.LearnAPI.Distribution(),
     orientation=Score(),
     external_aggregation_mode=Mean(),
-    human_name = "continuous boyce index",
+    human_name = "continuous Boyce index",
 )
 
 register(ContinuousBoyceIndex, "continuous_boyce_index", "cbi")
