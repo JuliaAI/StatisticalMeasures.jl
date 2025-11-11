@@ -259,7 +259,7 @@ end
 """
 function cbi(
     scores, y, positive_class; 
-    nbins, binwidth,
+    verbosity, nbins, binwidth,
     max=maximum(scores), min=minimum(scores), cor=StatsBase.corspearman
 )
     binstarts = range(min, stop=max-binwidth, length=nbins)
@@ -289,7 +289,7 @@ function cbi(
         n_total[i] = bin_index_last - bin_index_first + 1
     end
     if any_empty
-        @info "removing $(sum(empty_bins)) bins without any observations"
+        verbosity > 1 && @info "removing $(sum(empty_bins)) bins without any observations"
         deleteat!(n_positive, empty_bins)
         deleteat!(n_total, empty_bins)
         binstarts = binstarts[.!empty_bins]
