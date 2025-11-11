@@ -188,11 +188,11 @@ end
     y = categorical(probs .> rand(rng, 100))
     ŷ = UnivariateFinite(levels(y), probs, augment=true)
     # Should be pretty high
-    @test cbi(ŷ, y) ≈ 0.86 atol=0.01
+    @test cbi(ŷ, y) ≈ 0.87 atol=0.01
 
     # Passing different correlation methods works
     @test ContinuousBoyceIndex(cor=cor)(ŷ, y) ≈ 0.90 atol = 0.01
-    @test ContinuousBoyceIndex(nbins = 11)(ŷ, y) ≈ 0.83 atol = 0.01 
+    @test ContinuousBoyceIndex(nbins = 11, binwidth = 0.03)(ŷ, y) ≈ 0.77 atol = 0.01 
 
     # Randomized test: shuffled labels, should be near 0
     y_shuf = copy(y)
@@ -217,11 +217,14 @@ end
 
     cbi_dropped_bins = @test_logs(
         (:warn, unordered_warning), (:info, "removing 91 bins without any observations",),
-        ContinuousBoyceIndex(; min =0.0, max = 2.0, nbins = 191, bin_overlap = 0.05)(ŷ, y),
+        ContinuousBoyceIndex(; verbosity = 2, min =0.0, max = 2.0, nbins = 191)(ŷ, y),
     )
     # These two are identical because bins are dropped
     @test cbi_dropped_bins == 
-        ContinuousBoyceIndex(; min = 0.0, max = 1.2, nbins = 111, bin_overlap = 0.1/1.2)(ŷ, y)
+        ContinuousBoyceIndex(; min = 0.0, max = 1.2, nbins = 111)(ŷ, y)
+    
+    # cbi is silent for verbosity 0
+    @test_logs ContinuousBoyceIndex(; verbosity = 0)(ŷ, y)
 end
 
 @testset "l2_check" begin
