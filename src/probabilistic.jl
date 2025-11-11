@@ -549,27 +549,29 @@ const spherical_score = SphericalScore()
 # ---------------------------------------------------------------------
 # Continuous Boyce Index
 struct _ContinuousBoyceIndex 
+    verbosity::Int
     nbins::Integer
-    bin_overlap::AbstractFloat
-    min::Union{AbstractFloat, Nothing}
-    max::Union{AbstractFloat, Nothing}
+    binwidth::Float64
+    min::Float64
+    max::Float64
     cor::Function
-    function _ContinuousBoyceIndex(; nbins = 101, bin_overlap = 0.1, min = nothing, max = nothing, cor = StatsBase.corspearman)
-        new(nbins, bin_overlap, min, max, cor)
+    function _ContinuousBoyceIndex(; 
+        verbosity = 1, nbins = 101, binwidth = 0.1, 
+        min = 0, max = 1, cor = StatsBase.corspearman
+    )
+        new(verbosity, nbins, binwidth, min, max, cor)
     end
 end
 
 ContinuousBoyceIndex(; kw...) = _ContinuousBoyceIndex(; kw...) |> robust_measure |> fussy_measure
 
-function (m::_ContinuousBoyceIndex)(ŷ::AbstractArray{<:UnivariateFinite}, y::NonMissingCatArrOrSub; warn=true)
-    warn && warn_unordered(levels(y))
+function (m::_ContinuousBoyceIndex)(ŷ::AbstractArray{<:UnivariateFinite}, y::NonMissingCatArrOrSub)
+    m.verbosity > 0 && warn_unordered(levels(y))
     positive_class = levels(first(ŷ))|> last
     scores = pdf.(ŷ, positive_class)
-    max = isnothing(m.max) ? maximum(scores) : m.max
-    min = isnothing(m.min) ? minimum(scores) : m.min
-    binwidth = m.bin_overlap * (max - min)
 
-    return Functions.cbi(scores, y, positive_class; nbins = m.nbins, binwidth, max, min, cor = m.cor)
+    return Functions.cbi(scores, y, positive_class; 
+        verbosity = m.verbosity, nbins = m.nbins, binwidth = m.binwidth, max = m.max, min = m.min, cor = m.cor)
 end
 
 const ContinuousBoyceIndexType = API.FussyMeasure{<:API.RobustMeasure{<:_ContinuousBoyceIndex}}
@@ -589,7 +591,7 @@ StatisticalMeasures.@trait(
 register(ContinuousBoyceIndex, "continuous_boyce_index", "cbi")
 
 const ContinuousBoyceIndexDoc = docstring(
-    "ContinuousBoyceIndex(; nbins=101, bin_overlap=0.1, min=nothing, max=nothing, cor=StatsBase.corspearman)",
+    "ContinuousBoyceIndex(; verbosity=1, nbins=101, bin_overlap=0.1, min=nothing, max=nothing, cor=StatsBase.corspearman)",
     body=
 """
 The Continuous Boyce Index is a measure for evaluating the performance of probabilistic predictions for binary classification, 
@@ -598,16 +600,16 @@ It compares the predicted probability scores for the positive class across bins,
     and negative samples in each bin is strongly correlated to the value at that bin.
 
 ## Keywords
-
+- `verbosity`: Verbosity level.
 - `nbins`: Number of bins to use for score partitioning.
-- `bin_overlap`: Relative overlap between bins. The actual bin width is `bin_overlap * (max - min)`.
-- `min`, `max`: Optional minimum and maximum score values for binning. Default to the
-    maximum and minimum values of the scores.
+- `binwidth`: The width of each bin, which defaults to 0.1.
+- `min`, `max`: Optional minimum and maximum score values for binning. Default to the 0 and 1, respectively.
 - `cor`: Correlation function (defaults to StatsBase.corspearman, i.e. Spearman correlation).
 
 ## Arguments
 
-The predictions `ŷ` should be a vector of `UnivariateFinite` distributions from CategoricalDistributions.jl, and `y` a vector of ground truth labels.
+The predictions `ŷ` should be a vector of `UnivariateFinite` distributions from CategoricalDistributions.jl, 
+    and `y` a CategoricalVector of ground truth labels.
 
 Returns the correlation between the ratio of positive to negative samples in each bin and the bin centers.
 
