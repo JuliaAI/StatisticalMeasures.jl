@@ -249,6 +249,59 @@ function matthews_correlation(m)
     return mcc
 end
 
+"""
+    Functions.cbi(
+        probability_of_positive, ground_truth_observations, positive_class, 
+        nbins, binwidth, ma=maximum(scores), mi=minimum(scores), cor=corspearman
+    )
+    Return the Continuous Boyce Index (CBI) for a vector of probabilities and ground truth observations.
+
+"""
+function cbi(
+    scores, y, positive_class; 
+    verbosity, nbins, binwidth,
+    max=maximum(scores), min=minimum(scores), cor=StatsBase.corspearman
+)
+    binstarts = range(min, stop=max-binwidth, length=nbins)
+    binends = binstarts .+ binwidth
+
+    sorted_indices = sortperm(scores)
+    sorted_scores = view(scores, sorted_indices)
+    sorted_y = view(y, sorted_indices)
+
+    n_positive = zeros(Int, nbins)
+    n_total = zeros(Int, nbins)
+    empty_bins = falses(nbins)
+    any_empty = false
+
+    @inbounds for i in 1:nbins
+        bin_index_first = searchsortedfirst(sorted_scores, binstarts[i])
+        bin_index_last = searchsortedlast(sorted_scores, binends[i])
+        if bin_index_first > bin_index_last
+            empty_bins[i] = true
+            any_empty = true
+        end
+        @inbounds for j in bin_index_first:bin_index_last
+            if sorted_y[j] == positive_class 
+                n_positive[i] += 1
+            end
+        end
+        n_total[i] = bin_index_last - bin_index_first + 1
+    end
+    if any_empty
+        verbosity > 1 && @info "removing $(sum(empty_bins)) bins without any observations"
+        deleteat!(n_positive, empty_bins)
+        deleteat!(n_total, empty_bins)
+        binstarts = binstarts[.!empty_bins]
+    end
+
+    # calculate "PE-ratios" - a bunch of things cancel out but that does not matter for
+    # any correlation calculation
+    PE_ratios = n_positive ./ n_total
+    return cor(PE_ratios, binstarts)
+end
+
+
 
 # ## binary, but NOT invariant under class relabellings
 
