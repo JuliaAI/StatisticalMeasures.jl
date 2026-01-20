@@ -180,6 +180,53 @@ end
     @test_throws StatisticalMeasures.ERR_UNSUPPORTED_ALPHA s(yhat, [1.0, 1.0])
 end
 
+@testset "ContinuousBoyceIndex" begin
+    rng = srng(1234)
+    # Simple synthetic test: perfectly separates positives and negatives
+    c = ["neg", "pos"]
+    probs = repeat(0.0:0.1:0.9, inner = 10) .+ rand(rng, 100) .* 0.1
+    y = categorical(probs .> rand(rng, 100))
+    ŷ = UnivariateFinite(levels(y), probs, augment=true)
+    # Should be pretty high
+    @test cbi(ŷ, y) ≈ 0.87 atol=0.01
+
+    # Passing different correlation methods works
+    @test ContinuousBoyceIndex(cor=cor)(ŷ, y) ≈ 0.90 atol = 0.01
+    @test ContinuousBoyceIndex(nbins = 11, binwidth = 0.03)(ŷ, y) ≈ 0.77 atol = 0.01 
+
+    # Randomized test: shuffled labels, should be near 0
+    y_shuf = copy(y)
+    MLUtils.shuffle!(rng, y_shuf)
+    @test (cbi(ŷ, y_shuf)) ≈ 0.0 atol=0.1
+
+    # Test invariance to order
+    idx = randperm(length(y))
+    @test isapprox(cbi(ŷ[idx], y[idx]), cbi(ŷ, y), atol=1e-8)
+
+    # Test with all positives or all negatives return NaN
+    y_allpos = categorical(trues(100), levels = levels(y))
+    y_allneg = categorical(falses(100), levels = levels(y))
+    @test isnan(cbi(ŷ, y_allpos))
+    @test isnan(cbi(ŷ, y_allneg))
+
+    unordered_warning = StatisticalMeasures.warn_unordered([false, true])
+    @test_logs(
+        (:warn, unordered_warning),
+        cbi(ŷ, y),
+     )
+
+    cbi_dropped_bins = @test_logs(
+        (:warn, unordered_warning), (:info, "removing 91 bins without any observations",),
+        ContinuousBoyceIndex(; verbosity = 2, min =0.0, max = 2.0, nbins = 191)(ŷ, y),
+    )
+    # These two are identical because bins are dropped
+    @test cbi_dropped_bins == 
+        ContinuousBoyceIndex(; min = 0.0, max = 1.2, nbins = 111)(ŷ, y)
+    
+    # cbi is silent for verbosity 0
+    @test_logs ContinuousBoyceIndex(; verbosity = 0)(ŷ, y)
+end
+
 @testset "l2_check" begin
     d = Distributions.Normal()
     yhat = Union{Distributions.Sampleable,Missing}[d, d, missing]
