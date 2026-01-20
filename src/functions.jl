@@ -34,8 +34,18 @@ log_cosh_difference(yhat, y) = log_cosh(yhat - y)
 
 *Private method.*
 
-Return the index of unique elements in `Real` vector `v` under the assumption that the
-vector `v` is sorted in decreasing order.
+Return the index of the first appearance of each element within `v`, under the untested
+assumption that `v` is sorted in decreasing order.
+
+```julia-repl
+julia> [5, 5, 4, 3, 3, 3, 2, 1] |> _idx_unique_sorted
+5-element Vector{Int64}:
+ 1
+ 3
+ 4
+ 7
+ 8
+```
 
 """
 function _idx_unique_sorted(v)
