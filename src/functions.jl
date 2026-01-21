@@ -27,7 +27,8 @@ log_cosh(x::T) where T<:Real = x + _softplus(-2x) - log(convert(T, 2))
 log_cosh_difference(yhat, y) = log_cosh(yhat - y)
 
 
-# # ROC CURVE
+# # CONFUSION MATRIX AT THRESHOLDS
+
 
 """
     _idx_unique_sorted(v)
@@ -65,6 +66,84 @@ function _idx_unique_sorted(v)
     return idx
 end
 
+const DOC_CONFUSION_AT_THRESHOLDS(;middle="", footer="") =
+"""
+
+For a binary classification problem, return probability thresholds and corresponding
+confusion matrix entries, suitable for generating ROC curves, precision-recall curves, and
+variations on these. Primarily intended as a backend for implementations of those two
+cases.
+
+$middle
+
+If there are `k` unique probabilities, then there are correspondingly `k` thresholds
+and `k+1` "bins" over which the false positive and true positive rates are constant.:
+
+- `[0.0 - thresholds[1]]`
+- `(thresholds[1] - thresholds[2]]`
+- ...
+- `(thresholds[k] - 1]`
+
+Consequently, `TN`, `FP`, `FN`, `TP`, will have length `k + 1` if `thresholds` has length
+`k`.
+
+The `j`th raw confusion matrix will be `reshape([TN[j], FP[j], FN[j], TP[j]], 2, 2)`,
+according to conventions used elsewhere in StatisticalMeasures.jl, which explains the
+chosen order for the return value.
+
+$footer """
+
+"""
+    Functions.confusion_counts_at_thresholds(probs_of_positive, ground_truth_obs, positive_class) ->
+        (TN, FP, FN, TP), thresholds
+
+$(DOC_CONFUSION_AT_THRESHOLDS())
+
+Assumes there are no more than two classes but does not check this. Does not check that
+`positive_class` is one of the observed classes.
+
+"""
+function confusion_counts_at_thresholds(scores, y, positive_class)
+    n = length(y)
+
+    ranking = sortperm(scores, rev=true)
+
+    scores_sort = scores[ranking]
+    y_sort_bin  = (y[ranking] .== positive_class)
+
+    idx_unique = _idx_unique_sorted(scores_sort)
+    thresholds = scores_sort[idx_unique]
+
+    # detailed computations with example:
+    # y_sort_bin = [  1   0   0   1   0   0   1]
+    # s          = [0.5 0.5 0.2 0.2 0.1 0.1 0.1] thresh are 0.5 0.2, 0.1 // idx [1, 3, 5]
+    # ŷ          = [  0   0   0   0   0   0   0] (0.5 - 1.0] # no pos pred
+    # ŷ          = [  1   1   0   0   0   0   0] (0.2 - 0.5] # 2 pos pred
+    # ŷ          = [  1   1   1   1   0   0   0] (0.1 - 0.2] # 4 pos pred
+    # ŷ          = [  1   1   1   1   1   1   1] [0.0 - 0.1] # all pos pre
+
+    idx_unique_2 = idx_unique[2:end]   # [3, 5]
+    n_ŷ_pos      = idx_unique_2 .- 1   # [2, 4] implicit [0, 2, 4, 7]
+
+    cs = cumsum(y_sort_bin)          # [1, 1, 1, 2, 2, 2, 3]
+    tp = cs[n_ŷ_pos]                 # [1, 2] implicit [0, 1, 2, 3]
+    fp = n_ŷ_pos .- tp               # [1, 2] implicit [0, 1, 2, 4]
+
+    # add end points
+    P = cs[end]   # total number of observed positives (3)
+    N = n - P     # total number of observed negatives (4)
+
+    tp = [0, tp..., P] # [0, 1, 2, 3]
+    fp = [0, fp..., N] # [0, 1, 2, 4]
+    fn = P .- tp       # [3, 2, 1, 0]
+    tn = N .- fp       # [4, 3, 2, 0]
+
+    return (tn, fp, fn, tp), thresholds
+end
+
+
+# # ROC CURVE
+
 const DOC_ROC(;middle="", footer="") =
 """
 Return data for plotting the receiver operator characteristic (ROC curve) for a binary
@@ -76,9 +155,9 @@ If there are `k` unique probabilities, then there are correspondingly `k` thresh
 and `k+1` "bins" over which the false positive and true positive rates are constant.:
 
 - `[0.0 - thresholds[1]]`
-- `[thresholds[1] - thresholds[2]]`
+- `(thresholds[1] - thresholds[2]]`
 - ...
-- `[thresholds[k] - 1]`
+- `(thresholds[k] - 1]`
 
 Consequently, `true_positive_rates` and `false_positive_rates` have length `k+1` if
 `thresholds` has length `k`.
@@ -261,14 +340,14 @@ end
 
 """
     Functions.cbi(
-        probability_of_positive, ground_truth_observations, positive_class, 
+        probability_of_positive, ground_truth_observations, positive_class,
         nbins, binwidth, ma=maximum(scores), mi=minimum(scores), cor=corspearman
     )
     Return the Continuous Boyce Index (CBI) for a vector of probabilities and ground truth observations.
 
 """
 function cbi(
-    scores, y, positive_class; 
+    scores, y, positive_class;
     verbosity, nbins, binwidth,
     max=maximum(scores), min=minimum(scores), cor=StatsBase.corspearman
 )
@@ -292,7 +371,7 @@ function cbi(
             any_empty = true
         end
         @inbounds for j in bin_index_first:bin_index_last
-            if sorted_y[j] == positive_class 
+            if sorted_y[j] == positive_class
                 n_positive[i] += 1
             end
         end
