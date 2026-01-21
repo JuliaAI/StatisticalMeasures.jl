@@ -30,7 +30,7 @@ const CM = StatisticalMeasures.ConfusionMatrices
     rev_index_given_level = Dict("B" => 1, "A" => 2)
     @test cm == CM.ConfusionMatrix(n, rev_index_given_level)
     mat = @test_logs(
-        (:warn, StatisticalMeasures.warn_unordered(levels)),
+        (:warn, StatisticalMeasures.warning_unordered(levels)),
         CM.matrix(cm),
     )
     @test mat == m
