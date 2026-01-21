@@ -179,42 +179,16 @@ Assumes there are no more than two classes but does not check this. Does not che
 
 """
 function roc_curve(scores, y, positive_class)
-    n = length(y)
+    (tn, fp, fn, tp), thresholds =
+        confusion_counts_at_thresholds(scores, y, positive_class)
 
-    ranking = sortperm(scores, rev=true)
+    N = tn[1] # num observed negatives
+    P = fn[1] # num observed positives
 
-    scores_sort = scores[ranking]
-    y_sort_bin  = (y[ranking] .== positive_class)
+    tpr = tp ./ P
+    fpr = fp ./ N
 
-    idx_unique = _idx_unique_sorted(scores_sort)
-    thresholds = scores_sort[idx_unique]
-
-    # detailed computations with example:
-    # y = [  1   0   0   1   0   0   1]
-    # s = [0.5 0.5 0.2 0.2 0.1 0.1 0.1] thresh are 0.5 0.2, 0.1 // idx [1, 3, 5]
-    # ŷ = [  0   0   0   0   0   0   0] (0.5 - 1.0] # no pos pred
-    # ŷ = [  1   1   0   0   0   0   0] (0.2 - 0.5] # 2 pos pred
-    # ŷ = [  1   1   1   1   0   0   0] (0.1 - 0.2] # 4 pos pred
-    # ŷ = [  1   1   1   1   1   1   1] [0.0 - 0.1] # all pos pre
-
-    idx_unique_2 = idx_unique[2:end]   # [3, 5]
-    n_ŷ_pos      = idx_unique_2 .- 1   # [2, 4] implicit [0, 2, 4, 7]
-
-    cs   = cumsum(y_sort_bin)          # [1, 1, 1, 2, 2, 2, 3]
-    n_tp = cs[n_ŷ_pos]                 # [1, 2] implicit [0, 1, 2, 3]
-    n_fp = n_ŷ_pos .- n_tp             # [1, 2] implicit [0, 1, 2, 4]
-
-    # add end points
-    P = sum(y_sort_bin) # total number of true positives
-    N = n - P           # total number of true negatives
-
-    n_tp = [0, n_tp..., P] # [0, 1, 2, 3]
-    n_fp = [0, n_fp..., N] # [0, 1, 2, 4]
-
-    tprs = n_tp ./ P  # [0/3, 1/3, 2/3, 1]
-    fprs = n_fp ./ N  # [0/4, 1/4, 2/4, 1]
-
-    return fprs, tprs, thresholds
+    return fpr, tpr, thresholds
 end
 
 const DOC_AUC_REF =
