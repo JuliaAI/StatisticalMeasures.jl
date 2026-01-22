@@ -1,5 +1,9 @@
 # Reference
 
+```@index
+Pages = ["reference.md",]
+```
+
 ```@docs
 StatisticalMeasuresBase.unwrap
 StatisticalMeasuresBase.is_measure

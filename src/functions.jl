@@ -77,7 +77,7 @@ cases.
 $middle
 
 If there are `k` unique probabilities, then there are correspondingly `k` thresholds
-and `k+1` "bins" over which the false positive and true positive rates are constant.:
+and `k+1` "bins" over which the counts are  constant:
 
 - `[0.0 - thresholds[1]]`
 - `(thresholds[1] - thresholds[2]]`
