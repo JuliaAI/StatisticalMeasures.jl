@@ -79,13 +79,13 @@ $middle
 If there are `k` unique probabilities, then there are correspondingly `k` thresholds
 and `k+1` "bins" over which the counts are  constant:
 
-- `[0.0 - thresholds[1]]`
-- `(thresholds[1] - thresholds[2]]`
+- `[0.0, thresholds[1]]`
+- `(thresholds[1], thresholds[2]]`
 - ...
-- `(thresholds[k] - 1]`
+- `(thresholds[k], 1]`
 
-Consequently, `TN`, `FP`, `FN`, `TP`, will have length `k + 1` if `thresholds` has length
-`k`.
+Consequently, `TN`, `FP`, `FN` and `TP`, will each have length `k + 1` if `thresholds` has
+length `k`. Thresholds are returned in descending order.
 
 The `j`th raw confusion matrix will be `reshape([TN[j], FP[j], FN[j], TP[j]], 2, 2)`,
 according to conventions used elsewhere in StatisticalMeasures.jl, which explains the
@@ -154,16 +154,17 @@ $middle
 If there are `k` unique probabilities, then there are correspondingly `k` thresholds
 and `k+1` "bins" over which the false positive and true positive rates are constant.:
 
-- `[0.0 - thresholds[1]]`
-- `(thresholds[1] - thresholds[2]]`
+- `[0.0, thresholds[1]]`
+- `(thresholds[1], thresholds[2]]`
 - ...
-- `(thresholds[k] - 1]`
+- `(thresholds[k], 1]`
 
 Consequently, `true_positive_rates` and `false_positive_rates` have length `k+1` if
 `thresholds` has length `k`.
 
 To plot the curve using your favorite plotting backend, do something like
-`plot(false_positive_rates, true_positive_rates)`.
+`plot(false_positive_rates, true_positive_rates)`. Thresholds are returned in descending
+order.
 
 $footer
 """
@@ -175,7 +176,8 @@ $footer
 $(DOC_ROC())
 
 Assumes there are no more than two classes but does not check this. Does not check that
-`positive_class` is one of the observed classes.
+`positive_class` is one of the observed classes. For a method with checks, see
+[`roc_curve`](@ref).
 
 """
 function roc_curve(scores, y, positive_class)
@@ -190,6 +192,66 @@ function roc_curve(scores, y, positive_class)
 
     return fpr, tpr, thresholds
 end
+
+
+# # ROC CURVE
+
+tamed_divide(a, b) = b == 0 ? 0 : a/b
+
+const DOC_PRECISION_RECALL(;middle="", footer="") =
+"""
+Return data for plotting the precision-recall (PR) curve for a binary
+classification problem.
+
+$middle
+
+If there are `k` unique probabilities, then there are correspondingly `k` thresholds
+and `k+1` "bins" over which the false positive and true positive rates are constant:
+
+- `[0.0, thresholds[1]]`
+- `(thresholds[1], thresholds[2]]`
+- ...
+- `(thresholds[k],  1]`
+
+Consequently, `precisions` and `recalls` have length `k+1` if
+`thresholds` has length `k`. Thresholds are returned in descending order.
+
+To plot the curve using your favorite plotting backend, do something like
+`plot(precisions, recalls)`.
+
+$footer
+"""
+
+"""
+    Functions.pecision_recall_curve(probs_of_positive, ground_truth_obs, positive_class) ->
+        precisions, recalls, thresholds
+
+$(DOC_PRECISION_RECALL())
+
+Assumes there are no more than two classes but does not check this. Does not check that
+`positive_class` is one of the observed classes. Does not check that a positive class is
+actually observed, and will return `Inf` or `NaN` values for the recall in the event of no
+such observation.  For a method with checks, see [`precision_recall_curve`](@ref).
+
+"""
+function precision_recall_curve(scores, y, positive_class)
+    (tn, fp, fn, tp), thresholds =
+        confusion_counts_at_thresholds(scores, y, positive_class)
+
+    k = length(tp)
+    precisions = Vector{Float64}(undef, k)
+    @. precisions = tamed_divide(tp, tp + fp)
+    # force precision = 1 at threshold -> 1:
+    precisions[1] = 1
+
+    recalls = Vector{Float64}(undef, k)
+    P = fn[1] # num observed positives
+    @. recalls = tp / P
+    return precisions, recalls,  thresholds
+end
+
+
+# # AUC
 
 const DOC_AUC_REF =
     "Implementation is based on the Mann-Whitney U statistic.  See the "*
