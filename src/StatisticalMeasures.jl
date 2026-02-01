@@ -34,6 +34,7 @@ include("tools.jl")
 include("functions.jl")
 include("confusion_matrices.jl")
 include("roc.jl")
+include("precision_recall.jl")
 include("docstrings.jl")
 include("registry.jl")
 include("continuous.jl")
@@ -71,22 +72,7 @@ export measures,
     supports_missings_measure,
     fussy_measure
 
-export Functions, ConfusionMatrices, NoAvg, MacroAvg, MicroAvg, roc_curve
-
-#tod look out for MLJBase.aggregate called on scalars, which is not supported here.
-#todo in mljbase, single(measure, array1, array2)
-
-#todo need a show(::Measure)
-#todo `is_measure_type` in MLJBase is not provided here
-
-#todo: following needs adding to section on continuous measures
-# _scale(x, w::Arr, i) = x*w[i]
-# _scale(x, ::Nothing, i::Any) = x
-
-#todo: _skipinvalid from MLJBase/src/data/data.jl is needed for balanced accuracy, barring
-# a refactor of that measure to use `skipinvalid` as provided in this package.
-
-#todo: look for uses of aggregation of dictionaries in MLJBase, which is no longer
-# supported, or add support.
+export Functions, ConfusionMatrices, NoAvg, MacroAvg, MicroAvg
+export roc_curve, precision_recall_curve
 
 end
