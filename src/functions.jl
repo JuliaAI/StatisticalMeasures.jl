@@ -66,41 +66,62 @@ function _idx_unique_sorted(v)
     return idx
 end
 
-const DOC_CONFUSION_AT_THRESHOLDS(;middle="", footer="") =
+const DOC_YHAT_Y =
+"""
+
+Here `ŷ` is a vector of predicted numerical probabilities of the specified
+`positive_outcome`, which is one of two possible values occurring in the provided vector
+`y` of ground truth observations.
+
+The returned probability `thresholds` are the distinct values taken on by `ŷ`, listed in
+descending order. In particular, `0` and `1` are only included if they are present in `ŷ`.
+
+"""
+
+DOC_THRESHOLDS(; counts="counts") =
+"""
+
+If `thresholds` has length `k`, then there are `k+1` "bins" over which the $counts
+are constant:
+
+- `[0.0, thresholds[k])`
+- `[thresholds[k], thresholds[k - 1])`
+- ...
+- `[thresholds[1], 1]`
+
+"""
+
+const DOC_CONFUSION_CHECK = "Assumes there are no more than two classes but does "*
+    "not check this. Does not check that "*
+    "`positive_class` is one of the observed classes. "
+
+const DOC_CONFUSION_AT_THRESHOLDS(;middle=DOC_YHAT_Y, footer=DOC_CONFUSION_CHECK) =
 """
 
 For a binary classification problem, return probability thresholds and corresponding
-confusion matrix entries, suitable for generating ROC curves, precision-recall curves, and
-variations on these. Primarily intended as a backend for implementations of those two
-cases.
+confusion matrix entries, suitable for generating ROC curves and precision-recall curves
+(and variations on these). Primarily intended as a backend for implementations of those
+two cases.
 
 $middle
 
-If there are `k` unique probabilities, then there are correspondingly `k` thresholds
-and `k+1` "bins" over which the counts are  constant:
+$(DOC_THRESHOLDS())
 
-- `[0.0, thresholds[1]]`
-- `(thresholds[1], thresholds[2]]`
-- ...
-- `(thresholds[k], 1]`
-
-Consequently, `TN`, `FP`, `FN` and `TP`, will each have length `k + 1` if `thresholds` has
-length `k`. Thresholds are returned in descending order.
+Consequently, `TN`, `FP`, `FN` and `TP`, will each have length `k + 1` in that case.
 
 The `j`th raw confusion matrix will be `reshape([TN[j], FP[j], FN[j], TP[j]], 2, 2)`,
 according to conventions used elsewhere in StatisticalMeasures.jl, which explains the
 chosen order for the return value.
 
-$footer """
+$footer
 
 """
-    Functions.confusion_counts_at_thresholds(probs_of_positive, ground_truth_obs, positive_class) ->
+
+"""
+    Functions.confusion_counts_at_thresholds(ŷ, y, positive_class) ->
         (TN, FP, FN, TP), thresholds
 
 $(DOC_CONFUSION_AT_THRESHOLDS())
-
-Assumes there are no more than two classes but does not check this. Does not check that
-`positive_class` is one of the observed classes.
 
 """
 function confusion_counts_at_thresholds(scores, y, positive_class)
@@ -144,40 +165,32 @@ end
 
 # # ROC CURVE
 
-const DOC_ROC(;middle="", footer="") =
+const DOC_ROC(;middle=DOC_YHAT_Y, footer=DOC_CONFUSION_CHECK) =
 """
+
 Return data for plotting the receiver operator characteristic (ROC curve) for a binary
 classification problem.
 
 $middle
 
-If there are `k` unique probabilities, then there are correspondingly `k` thresholds
-and `k+1` "bins" over which the false positive and true positive rates are constant.:
+$(DOC_THRESHOLDS(counts="rates"))
 
-- `[0.0, thresholds[1]]`
-- `(thresholds[1], thresholds[2]]`
-- ...
-- `(thresholds[k], 1]`
-
-Consequently, `true_positive_rates` and `false_positive_rates` have length `k+1` if
-`thresholds` has length `k`.
+Accordingly, `true_positive_rates` and `false_positive_rates` have length `k+1` in that
+case.
 
 To plot the curve using your favorite plotting backend, do something like
-`plot(false_positive_rates, true_positive_rates)`. Thresholds are returned in descending
-order.
+`plot(false_positive_rates, true_positive_rates)`.
 
 $footer
 """
 
 """
-    Functions.roc_curve(probs_of_positive, ground_truth_obs, positive_class) ->
+    Functions.roc_curve(ŷ, y, positive_class) ->
         false_positive_rates, true_positive_rates, thresholds
 
 $(DOC_ROC())
 
-Assumes there are no more than two classes but does not check this. Does not check that
-`positive_class` is one of the observed classes. For a method with checks, see
-[`roc_curve`](@ref).
+For a method with checks, see [`roc_curve`](@ref).
 
 """
 function roc_curve(scores, y, positive_class)
@@ -194,44 +207,38 @@ function roc_curve(scores, y, positive_class)
 end
 
 
-# # ROC CURVE
+# # PRECISION RECALL CURVE
 
 tamed_divide(a, b) = b == 0 ? 0 : a/b
 
-const DOC_PRECISION_RECALL(;middle="", footer="") =
+const DOC_ROC_CHECK = DOC_CONFUSION_CHECK*
+    "That failing to be the case, each returned recall will be `Inf` or `NaN`. "
+
+const DOC_PRECISION_RECALL(;middle=DOC_YHAT_Y, footer=DOC_ROC_CHECK) =
 """
-Return data for plotting the precision-recall (PR) curve for a binary
+
+Return data for plotting the precision-recall curve (PR curve) for a binary
 classification problem.
 
 $middle
 
-If there are `k` unique probabilities, then there are correspondingly `k` thresholds
-and `k+1` "bins" over which the false positive and true positive rates are constant:
+$(DOC_THRESHOLDS(counts="precison and recall"))
 
-- `[0.0, thresholds[1]]`
-- `(thresholds[1], thresholds[2]]`
-- ...
-- `(thresholds[k],  1]`
-
-Consequently, `precisions` and `recalls` have length `k+1` if
-`thresholds` has length `k`. Thresholds are returned in descending order.
+Accordingly, `precisions` and `recalls` have length `k+1` in that case.
 
 To plot the curve using your favorite plotting backend, do something like
-`plot(precisions, recalls)`.
+`plot(recalls, precisions)`.
 
 $footer
 """
 
 """
-    Functions.pecision_recall_curve(probs_of_positive, ground_truth_obs, positive_class) ->
+    Functions.precision_recall_curve(ŷ, y, positive_class) ->
         precisions, recalls, thresholds
 
 $(DOC_PRECISION_RECALL())
 
-Assumes there are no more than two classes but does not check this. Does not check that
-`positive_class` is one of the observed classes. Does not check that a positive class is
-actually observed, and will return `Inf` or `NaN` values for the recall in the event of no
-such observation.  For a method with checks, see [`precision_recall_curve`](@ref).
+See also [`precision_recall_curve`](@ref), which includes some checks.
 
 """
 function precision_recall_curve(scores, y, positive_class)
@@ -677,7 +684,7 @@ $(docstring(
     "Functions.multiclass_fscore",
     sig="(m, β, average[, weights])",
     the=true,
-))*"\n Note that the `MicroAvg` score is insenstive to `β`. "
+))*"\n Note that the `MicroAvg` score is insensitive to `β`. "
 """
 multiclass_fscore(m, beta, average::MicroAvg) =
     multiclass_true_positive_rate(m, MicroAvg())

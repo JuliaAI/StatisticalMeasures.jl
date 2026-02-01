@@ -39,7 +39,9 @@ binary_levels(yhat, y) = throw(ERR_NEED_CATEGORICAL)
 $(Functions.DOC_ROC(
     middle="Here `ŷ` is a vector of `UnivariateFinite` distributions "*
         "(from CategoricalDistributions.jl) over the two "*
-        "values taken by the ground truth observations `y`, a `CategoricalVector`. ",
+        "values taken by the ground truth observations `y`, a `CategoricalVector`. "*
+        "The `thresholds`, listed in descending order, are the distinct predicted "*
+        "probabilities of the positive class. ",
     footer="Core algorithm: [`Functions.roc_curve`](@ref)"*
         "\n\nSee also [`AreaUnderCurve`](@ref). ",
 ))
