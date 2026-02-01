@@ -33,7 +33,7 @@ test_files = [
     "probabilistic.jl",
     "LossFunctionsExt.jl",
     "ScientificTypesExt.jl",
-#    "registry.jl",
+    "registry.jl",
 ]
 
 files = isempty(ARGS) ? test_files : ARGS

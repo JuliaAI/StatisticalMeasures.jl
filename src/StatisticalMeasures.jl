@@ -14,6 +14,7 @@ using LinearAlgebra
 using StatsBase
 import Distributions
 using PrecompileTools
+using REPL # needed for `Base.Docs.doc`
 
 const SM = "StatisticalMeasures"
 const CatArrOrSub{T, N} =
