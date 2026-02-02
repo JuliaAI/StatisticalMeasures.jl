@@ -23,12 +23,12 @@
         precision_recall_curve(ŷ, categorical([1, 2, 2, 2, 2, 2, 1, 2]))
     )
 
-    precisions, recalls, ts = @test_logs(
+    recalls, precisions, ts = @test_logs(
         (:warn, StatisticalMeasures.warning_unordered([0, 1])),
         precision_recall_curve(ŷ, y),
      )
 
-    core_function_precisions, core_function_recalls =
+    core_function_recalls, core_function_precisions =
         Functions.precision_recall_curve(s, y, 1)
 
     @test precisions == core_function_precisions
@@ -38,7 +38,7 @@
     s = [0.0 0.1 0.1 0.1 0.2 0.2 0.5 0.5] |> vec
     ŷ = UnivariateFinite([0, 1], s, augment=true, pool=y)
 
-    precisions2, recalls2, ts2 = @test_logs precision_recall_curve(ŷ, y)
+    recalls2, precisions2, ts2 = @test_logs precision_recall_curve(ŷ, y)
     @test precisions2 == precisions
     @test recalls2 == recalls
     @test ts2 == ts

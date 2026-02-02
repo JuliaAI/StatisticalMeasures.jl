@@ -22,7 +22,7 @@ ŷ[1]
 
 ```julia
 using Plots
-precisions, recalls, thresholds = precision_recall_curve(ŷ, y)
+recalls, precisions, thresholds = precision_recall_curve(ŷ, y)
 plt = plot(recalls, precisions, legend=false)
 plot!(plt, xlab="recall", ylab="precision")
 

@@ -254,7 +254,7 @@ function precision_recall_curve(scores, y, positive_class)
     recalls = Vector{Float64}(undef, k)
     P = fn[1] # num observed positives
     @. recalls = tp / P
-    return precisions, recalls,  thresholds
+    return recalls, precisions, thresholds
 end
 
 

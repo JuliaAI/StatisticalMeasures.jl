@@ -25,7 +25,7 @@ ŷ = [0.8, 0.9, 0.7, 0.1, 0.7, 0.8, 0.6, 0.7, 0.3, 0.9,
 end
 
 @testset "precision_recall_curve" begin
-    precisions, recalls, thresholds = Functions.precision_recall_curve(ŷ, y, "1")
+    recalls, precisions, thresholds = Functions.precision_recall_curve(ŷ, y, "1")
     @test precisions ≈ [1.0, [2, 3, 6, 7, 9, 11] ./ [3, 7, 12, 15, 18, 20]...]
     @test recalls ≈ [0, 2, 3, 6, 7, 9, 11]/11
     @test thresholds == sort(unique(ŷ)) |> reverse
