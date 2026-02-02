@@ -190,7 +190,8 @@ $footer
 
 $(DOC_ROC())
 
-For a method with checks, see [`roc_curve`](@ref).
+For a method with checks, see [`roc_curve`](@ref). See also
+[`Functions.confusion_counts_at_thresholds`](@ref).
 
 """
 function roc_curve(scores, y, positive_class)
@@ -238,7 +239,8 @@ $footer
 
 $(DOC_PRECISION_RECALL())
 
-See also [`precision_recall_curve`](@ref), which includes some checks.
+See also [`precision_recall_curve`](@ref), which includes some checks, and
+[`Functions.confusion_counts_at_thresholds`](@ref).
 
 """
 function precision_recall_curve(scores, y, positive_class)
