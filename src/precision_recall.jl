@@ -32,6 +32,34 @@ binary_levels_pr(
 ) = throw(ERR_PR1)
 binary_levels_pr(yhat, y) = throw(ERR_NEED_CATEGORICAL_PR)
 
+const DOC_PR_EXAMPLE =
+"""
+
+```
+using StatisticalMeasures
+using CategoricalArrays
+using CategoricalDistributions
+
+# ground truth:
+y = categorical(["X", "O", "X", "X", "O", "X", "X", "O", "O", "X"], ordered=true)
+
+# probabilistic predictions:
+X_probs = [0.3, 0.2, 0.4, 0.9, 0.1, 0.4, 0.5, 0.2, 0.8, 0.7]
+ŷ = UnivariateFinite(["O", "X"], X_probs, augment=true, pool=y)
+ŷ[1]
+
+using Plots
+recalls, precisions, thresholds = precision_recall_curve(ŷ, y)
+plt = plot(recalls, precisions, legend=false)
+plot!(plt, xlab="recall", ylab="precision")
+
+# proportion of observations that are positive:
+p = precisions[end] # threshold=0
+plot!([0, 1], [p, p], linewidth=2, linestyle=:dash, color=:black)
+```
+
+"""
+
 """
     precision_recall_curve(ŷ, y) -> false_positive_rates, true_positive_rates, thresholds
 
@@ -41,7 +69,7 @@ $(Functions.DOC_PRECISION_RECALL(
         "values taken by the ground truth observations `y`, a `CategoricalVector`. "*
         "The `thresholds`, listed in descending order, are the distinct predicted "*
         "probabilities of the positive class. ",
-    footer="Core algorithm: [`Functions.precision_recall_curve`](@ref). "
+    footer="Core algorithm: [`Functions.precision_recall_curve`](@ref). "*DOC_PR_EXAMPLE
 ))
 """
 function precision_recall_curve(yhat, y)
