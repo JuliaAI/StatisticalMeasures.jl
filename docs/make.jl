@@ -28,6 +28,7 @@ makedocs(
         "The Measures" => "auto_generated_list_of_measures.md",
         "Confusion Matrices" => "confusion_matrices.md",
         "Receiver Operator Characteristics" => "roc.md",
+        "Precision-Recall Curves" => "precision_recall.md",
         "Tools" => "tools.md",
         "Reference" => "reference.md",
     ],
@@ -41,4 +42,3 @@ deploydocs(
     devbranch="dev",
     push_preview=false,
 )
-

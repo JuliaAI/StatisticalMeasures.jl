@@ -31,7 +31,7 @@ p = precisions[end] # threshold=0
 plot!([0, 1], [p, p], linewidth=2, linestyle=:dash, color=:black)
 ```
 
-![](assets/roc_curve.png)
+![](assets/precision_recall_curve.png)
 
 ## Reference
 
