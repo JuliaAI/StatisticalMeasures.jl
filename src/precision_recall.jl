@@ -41,8 +41,7 @@ $(Functions.DOC_PRECISION_RECALL(
         "values taken by the ground truth observations `y`, a `CategoricalVector`. "*
         "The `thresholds`, listed in descending order, are the distinct predicted "*
         "probabilities of the positive class. ",
-    footer="Core algorithm: [`Functions.precision_recall_curve`](@ref)"*
-        "\n\nSee also [`AreaUnderPrecisionRecalCurve`](@ref). ",
+    footer="Core algorithm: [`Functions.precision_recall_curve`](@ref). "
 ))
 """
 function precision_recall_curve(yhat, y)
