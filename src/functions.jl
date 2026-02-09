@@ -70,7 +70,7 @@ const DOC_YHAT_Y =
 """
 
 Here `ŷ` is a vector of predicted numerical probabilities of the specified
-`positive_outcome`, which is one of two possible values occurring in the provided vector
+`positive_class`, which is one of two possible values occurring in the provided vector
 `y` of ground truth observations.
 
 The returned probability `thresholds` are the distinct values taken on by `ŷ`, listed in
