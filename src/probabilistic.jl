@@ -168,7 +168,7 @@ const PrecisionAtFixedRecallType = API.FussyMeasure{
 register(PrecisionAtFixedRecall, "precision_at_fixed_recall")
 
 const PrecisionAtFixedRecallDoc = docstring(
-    "PrecisionAtFixedRecall()",
+    "PrecisionAtFixedRecall(; recall_threshold=0.95)",
     body=
 """
 It is expected that `ŷ` be a vector of distributions over the binary set of unique
