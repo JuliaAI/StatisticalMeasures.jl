@@ -218,8 +218,10 @@ const DOC_ROC_CHECK = DOC_CONFUSION_CHECK*
 const DOC_PRECISION_RECALL(;middle=DOC_YHAT_Y, footer=DOC_ROC_CHECK) =
 """
 
-Return data for plotting the precision-recall curve (PR curve) for a binary
-classification problem.
+Return data for plotting the precision-recall curve (PR curve) for a binary classification
+problem. The first point on the corresponding curve is always `(recall, precision) = (0,
+1)`, while the last point is always `(recall, precision) = (1, p)` where `p` is the
+proportion of positives in the observed sample `y`.
 
 $middle
 
