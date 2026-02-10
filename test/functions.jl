@@ -85,7 +85,53 @@ end
     @test isapprox(Functions.auc(scores, y, 1), 0.8333333333333334, rtol=1e-16)
 end
 
-@testset "accuracy" begin
+@testset "precision_at_fixed_recall" begin
+
+    # comparing with hand calculation, example one
+    y = ["O", "X", "X", "X", "X", "O", "O", "O", "X", "X"]
+    yhat = [0.3, 0.2, 0.4, 0.9, 0.1, 0.4, 0.5, 0.2, 0.8, 0.7]
+    recalls, precisions, thresholds = Functions.precision_recall_curve(yhat, y,"X")
+    # recalls =    [0.00, 0.167, 0.333, 0.500, 0.500, 0.667, 0.667, 0.833, 1.00]
+    # precisions = [1.00, 1.00,  1.00,  1.00,  0.75,  0.677, 0.571, 0.556, 0.60]
+    # (last values here don't correspond to a prediction, so are ignored)
+    recall_thresholds = [0.1,  0.2,  0.4,  0.51, 0.74, 0.9]
+    p = precisions
+    # by manual inspection:
+    precisions_at_recall = [p[2], p[3], (p[4] + p[5])/2 , (p[6] + p[7])/2, p[8], 0]
+    for (i, recall_threshold) in enumerate(recall_thresholds)
+        @test Functions.precision_at_fixed_recall(
+            yhat, y, "X";
+            recall_threshold,
+        ) ≈ precisions_at_recall[i]
+    end
+    # extreme thresholds:
+    @test Functions.precision_at_fixed_recall(yhat, y, "X"; recall_threshold=0.9)==0
+    @test Functions.precision_at_fixed_recall(yhat, y, "X"; recall_threshold=1)==0
+
+    # comparing with hand calculation, example one
+    y = ["X", "O", "X", "X", "O", "X", "X", "O", "O", "X"]
+    recalls, precisions, thresholds = Functions.precision_recall_curve(yhat, y,"X")
+    # recalls =    [0.00, 0.167, 0.167, 0.333, 0.500, 0.833, 1.00,  1.00,  1.00]
+    # precisions = [1.00, 1.00,  0.500, 0.667, 0.750, 0.833, 0.857, 0.667, 0.6]
+    # (last values here don't correspond to a prediction, so are ignored)
+    recall_thresholds = [0.1,  0.2,  0.4,  0.6, 0.9, 1.0]
+    p = precisions
+    # by manual inspection:
+    precisions_at_recall =
+        [(p[2] + p[3])/2, p[4], p[5], p[6], (p[7] + p[8])/2, (p[7] + p[8])/2]
+    for (i, recall_threshold) in enumerate(recall_thresholds)
+        @test Functions.precision_at_fixed_recall(
+            yhat, y, "X";
+            recall_threshold,
+        ) ≈ precisions_at_recall[i]
+    end
+    # extreme thresholds:
+    @test Functions.precision_at_fixed_recall(yhat, y, "X"; recall_threshold=1.1)==0
+
+end
+
+
+    @testset "accuracy" begin
     y = rand(rng, "abc", 100)
     ŷ =  rand(rng, "abc", 100)
     cm = CM.confmat(y, ŷ)
