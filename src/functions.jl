@@ -346,7 +346,7 @@ Here `ŷ` is a vector of predicted numerical probabilities of the specified
 `positive_class`, which is one of two possible values occurring in the provided vector `y`
 of ground truth observations.
 
-DOC_CONFUSION_CHECK
+$DOC_CONFUSION_CHECK
 
 """
 function precision_at_fixed_recall(
