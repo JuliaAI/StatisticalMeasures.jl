@@ -322,8 +322,7 @@ the precision).
 
 More precisely, the measure:
 
-1. Determines all values of the recall, as one varies the probability threshold for a
-positive outcome over all predicted probabilities for that class.
+1. Determines all values of the recall, as one varies the probability threshold for a positive outcome over all predicted probabilities for that class.
 
 2. Among these recalls, finds the smallest one that exceeds or equals `recall_threshold`.
 
