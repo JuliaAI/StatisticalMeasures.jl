@@ -52,6 +52,18 @@ end
     @test !(view(y, 1:2) isa StatisticalMeasures.NonMissingCatArrOrSub)
 end
 
+@testset "PrecisionAtFixedRecall" begin
+    y = categorical(["O", "X", "X", "X", "X", "O", "O", "O", "X", "X"], ordered=true)
+    scores = [0.3, 0.2, 0.4, 0.9, 0.1, 0.4, 0.5, 0.2, 0.8, 0.7]
+    ŷ = UnivariateFinite(["O", "X"], scores, augment=true, pool=y)
+    recall_thresholds = [0.1, 0.2, 0.4, 0.51, 0.74, 0.95]
+    for recall_threshold in recall_thresholds
+        core = Functions.precision_at_fixed_recall(scores, y, "X"; recall_threshold)
+        wrapped = PrecisionAtFixedRecall(; recall_threshold)(ŷ, y)
+        @test core == wrapped
+    end
+end
+
 @testset "Log, Brier, Spherical - finite case" begin
     y = categorical(collect("abb"))
     L = [y[1], y[2]]
