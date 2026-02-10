@@ -15,8 +15,8 @@ import StatsBase: corspearman, randperm
 
 const CM = ConfusionMatrices
 
-# because tests were developed before measures were required to be directly callable and
-# before `call` was removed from StatisticalMeasuresBase:
+# because many tests were developed before measures were required to be directly callable
+# and before `call` was removed from StatisticalMeasuresBase:
 call(m, args...) = m(args...)
 
 srng(n=123) = StableRNG(n)
