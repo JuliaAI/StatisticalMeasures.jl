@@ -315,15 +315,14 @@ end
 
 const DOC_PRECISION_AT_FIXED_RECALL = """
 
-This measure returns the precision for a fixed recall. This metric is useful, in
-applications such as toxicity detection, anomaly detection, and screening for disease
-markers, if one wants a cap on the proportion of positives that are misclassified (one
-minus the recall) while minimizing the rate of false alarms (one minus the precision).
+This metric is useful, in applications such as toxicity detection, anomaly detection, and
+screening for disease markers, if one wants a cap on the proportion of positives that are
+misclassified (one minus the recall) while minimizing the rate of false alarms (one minus
+the precision).
 
 More precisely, the measure:
 
-1. Determines all values of the recall, as one varies the probability threshold for a
-positive outcome over all predicted probabilities for that class.
+1. Determines all values of the recall, as one varies the probability threshold for a positive outcome over all predicted probabilities for that class.
 
 2. Among these recalls, finds the smallest one that exceeds or equals `recall_threshold`.
 
@@ -338,6 +337,8 @@ returned. In the event no recall is found in Step 2, a precision of `0` is retur
 ```
 precision_at_fixed_recall(ŷ, y, positive_class; recall_threshold=0.95)
 ```
+
+Returns the precision for a fixed recall.
 
 $DOC_PRECISION_AT_FIXED_RECALL
 
