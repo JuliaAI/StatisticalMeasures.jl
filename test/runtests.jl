@@ -21,7 +21,6 @@ call(m, args...) = m(args...)
 
 srng(n=123) = StableRNG(n)
 
-
 test_files = [
     "tools.jl",
     "functions.jl",
