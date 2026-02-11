@@ -45,6 +45,28 @@ end
     @test tprs ≈ sk_tprs
 end
 
+@testset "average_precision"  begin
+    # compute "by hand":
+    recalls, precisions, _ = Functions.precision_recall_curve(ŷ, y, "1")
+    recalls[end] = 1.0
+    recall_deltas = [recalls[i + 1] - recalls[i] for i in 1:(length(recalls) - 1)]
+    area_deltas = precisions[1:(end -1)] .* recall_deltas
+    area = sum(area_deltas)
+
+    # compare:
+    @test Functions.average_precision(ŷ, y, "1") ≈ area
+
+    # repeat with an example whre the predicted probabilities include 1:
+    ŷ2 = [0.8, 1.0, 0.7, 0.1, 0.7, 0.8, 0.6, 0.7, 0.3, 0.9,
+     0.3, 0.8, 0.6, 0.7, 0.3, 0.9, 0.6, 0.7, 0.1, 0.8]
+    recalls, precisions, _ = Functions.precision_recall_curve(ŷ2, y, "1")
+    recalls[end] = 1.0
+    recall_deltas = [recalls[i + 1] - recalls[i] for i in 1:(length(recalls) - 1)]
+    area_deltas = precisions[1:(end -1)] .* recall_deltas
+    area = sum(area_deltas)
+    @test Functions.average_precision(ŷ2, y, "1") ≈ area
+end
+
 @testset "AUC" begin
     # this is random binary and random scores generated with numpy
     # then using roc_auc_score from sklearn to get the AUC
