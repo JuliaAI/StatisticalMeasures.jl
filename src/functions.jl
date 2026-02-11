@@ -282,7 +282,7 @@ const DOC_AVERAGE_PRECISION =
 """
 
 Average precision is the area under the empirical precision-recall curve, understood as a
-step function. This is to be contrasted with other measures going under the name "area
+step function. This is to be contrasted with measures going under the name "area
 under the precision-recall curve", in which the step function is usually replaced by a
 piece-wise linear approximation. Generally, differences between the two are only obvious
 when the number of observations is small, but it is faster to compute average precision.
@@ -312,9 +312,11 @@ this is avoided here.
 """
     function average_precision(ŷ, y, positive_class)
 
-Return the average precision corresponding to a vector `ŷ` of predicted numerical
-probabilities of the specified `positive_class`, which is one of two possible values
-occurring in the accompanying vector `y` of ground truth observations.
+Return the average precision.
+
+Here `ŷ` is a vector of predicted numerical probabilities of the specified
+`positive_class`, which is one of two possible values occurring in the provided vector `y`
+of ground truth observations.
 
 $DOC_AVERAGE_PRECISION
 
