@@ -281,7 +281,7 @@ precision](https://en.wikipedia.org/w/index.php?title=Information_retrieval&oldi
 Adopting each distinct predicted probability ``p_1, p_2, \\ldots, p_k`` for the positive
 class as a soft probability threshold for predicting an actual class, and assuming these
 are arranged in decreasing order, we obtain corresponding recalls ``R_1, R_2, \\ldots,
-R_k`` (monotonically increasing) and precision ``P_1, P_2, \\ldots, P_k``. Adding an extra
+R_k`` (monotonically increasing) and precisions ``P_1, P_2, \\ldots, P_k``. Adding an extra
 recall, ``R_{k+1} = 1``, the average precision implemented here is defined as
 
 ``\\sum_{j=1}^k P_j (R_{j+1} - R_j)``
