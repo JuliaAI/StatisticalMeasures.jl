@@ -276,6 +276,76 @@ function precision_recall_curve(scores, y, positive_class)
 end
 
 
+# # AVERAGE PRECISION
+
+const DOC_AVERAGE_PRECISION =
+"""
+
+Average precision is the area under the empirical precision-recall curve, understood as a
+step function. This is to be contrasted with "area under the precision-recall curve", in
+which the step function is usually replaced by a piece-wise linear
+approximation. Generally, differences between the two are only obvious when the number of
+observations is small, but it is faster to compute average precision.
+
+Reference: Wikipedia entry, [Average
+precision](https://en.wikipedia.org/w/index.php?title=Information_retrieval&oldid=793358396#Average_precision)
+
+# Definition
+
+Adopting each distinct predicted probability ``p_1, p_2, \\ldots, p_k`` for the positive
+class as a soft probability threshold for predicting an actual class, and assuming these
+are arranged in decreasing order, we obtain corresponding recalls ``R_1, R_2, \\ldots,
+R_k`` (monotonically increasing) and precision ``P_1, P_2, \\ldots, P_k``. Adding an extra
+recall, ``R_{k+1} = 1``, the average precision implemented here is defined as
+
+``\\sum_{j=1}^k P_j (R_{j+1} - R_j)``
+
+In some other implementations, such as
+[scikit-learn](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.average_precision_score.html#sklearn.metrics.average_precision_score),
+``P_j`` is replaced by ``P_{j+1}``. However, this requires the definition of a precision
+for unit recall, in the case the predicted positive class probabilities exclude `1.0`, and
+this is avoided here.
+
+"""
+
+"""
+    function average_precision(ŷ, y, positive_class)
+
+Return the average precision.
+
+Here `ŷ` is a vector of predicted numerical probabilities of the specified
+`positive_class`, which is one of two possible values occurring in the provided vector `y`
+of ground truth observations.
+
+$DOC_AVERAGE_PRECISION
+
+$DOC_CONFUSION_CHECK Method requires at least one observation, but this is not checked.
+
+"""
+function average_precision(ŷ, y, positive_class)
+
+    recalls, precisions, _ = precision_recall_curve(ŷ, y, positive_class)
+    area = 0.0
+
+    # `recalls` will have length at least two:
+    length(recalls) > 2 || return 1.0
+
+    r = recalls[1]
+
+    # We ignore the last precision, as this does not correspond to any predicted
+    # probability, but is rather an artifact to ensure precision-recall curves always have
+    # a recall=1 point. See the definition in the docstring.
+    for i in 1:length(precisions[1:(end -1)])
+        r_next = recalls[i + 1]
+        Δr = r_next - r
+        r = r_next
+        area += precisions[i]*Δr
+    end
+
+    return area
+end
+
+
 # # AUC
 
 const DOC_AUC_REF =
