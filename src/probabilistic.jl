@@ -66,7 +66,9 @@ end
 struct _AveragePrecision end
 
 function (m::_AveragePrecision)(ŷ::AbstractArray{<:UnivariateFinite}, y)
-    positive_class = CategoricalArrays.levels(first(ŷ))|> last
+    classes = CategoricalArrays.levels(first(ŷ))
+    warn_unordered(classes)
+    positive_class = last(classes)
     scores = pdf.(ŷ, positive_class)
 
     Functions.average_precision(scores, y, positive_class)
