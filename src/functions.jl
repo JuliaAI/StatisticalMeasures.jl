@@ -312,11 +312,9 @@ this is avoided here.
 """
     function average_precision(ŷ, y, positive_class)
 
-Return the average precision.
-
-Here `ŷ` is a vector of predicted numerical probabilities of the specified
-`positive_class`, which is one of two possible values occurring in the provided vector `y`
-of ground truth observations.
+Return the average precision corresponding to a vector `ŷ` of predicted numerical
+probabilities of the specified `positive_class`, which is one of two possible values
+occurring in the accompanying vector `y` of ground truth observations.
 
 $DOC_AVERAGE_PRECISION
 
