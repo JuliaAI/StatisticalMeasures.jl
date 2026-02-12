@@ -132,7 +132,6 @@ end
 
 function (m::_PrecisionAtFixedRecall)(ŷ::AbstractArray{<:UnivariateFinite}, y)
 
-    # actually this choice theoretically does not matter:
     positive_class = CategoricalArrays.levels(first(ŷ))|> last
     scores = pdf.(ŷ, positive_class)
 
