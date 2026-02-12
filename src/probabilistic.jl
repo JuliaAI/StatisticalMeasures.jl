@@ -61,6 +61,61 @@ function l2_check(measure, yhat, y, weight_args...)
 end
 
 # ---------------------------------------------------------
+# AveragePrecision
+
+struct _AveragePrecision end
+
+function (m::_AveragePrecision)(ŷ::AbstractArray{<:UnivariateFinite}, y)
+    positive_class = CategoricalArrays.levels(first(ŷ))|> last
+    scores = pdf.(ŷ, positive_class)
+
+    Functions.average_precision(scores, y, positive_class)
+end
+
+const AveragePrecision() = _AveragePrecision() |> robust_measure |> fussy_measure
+
+const AveragePrecisionType = API.FussyMeasure{
+    <:API.RobustMeasure{<:_AveragePrecision}
+}
+
+@fix_show AveragePrecision::AveragePrecisionType
+
+# `AveragePrecision` will inherit traits from `_AveragePrecision`:
+@trait(_AveragePrecision,
+       consumes_multiple_observations=true,
+       observation_scitype = OrderedFactor{2},
+       kind_of_proxy=LearnAPI.Distribution(),
+       orientation=Score(),
+       external_aggregation_mode=Mean(),
+       human_name = "average precision",
+)
+
+register(AveragePrecision, "average_precision")
+
+const AveragePrecisionDoc = docstring(
+    "AveragePrecision()",
+    body=
+"""
+It is expected that `ŷ` be a vector of distributions over the binary set of unique
+elements of `y`; specifically, `ŷ` should have eltype `<:UnivariateFinite` from the
+CategoricalDistributions.jl package.
+
+$(Functions.DOC_AVERAGE_PRECISION)
+
+Core implementation: [`Functions.average_precision`](@ref).
+
+""",
+    scitype = "",
+    footer="See also [`precision_recall_curve`](@ref). ",
+)
+
+"$AveragePrecisionDoc"
+AveragePrecision
+"$AveragePrecisionDoc"
+const average_precision = AveragePrecision()
+
+
+# ---------------------------------------------------------
 # AreaUnderCurve
 
 struct _AreaUnderCurve  end
