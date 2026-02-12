@@ -268,10 +268,10 @@ const DOC_AVERAGE_PRECISION =
 """
 
 Average precision is the area under the empirical precision-recall curve, understood as a
-step function. This is to be contrasted with "area under the precision-recall curve", in
-which the step function is usually replaced by a piece-wise linear
-approximation. Generally, differences between the two are only obvious when the number of
-observations is small, but it is faster to compute average precision.
+step function. This is to be contrasted with other measures going under the name "area
+under the precision-recall curve", in which the step function is usually replaced by a
+piece-wise linear approximation. Generally, differences between the two are only obvious
+when the number of observations is small, but it is faster to compute average precision.
 
 Reference: Wikipedia entry, [Average
 precision](https://en.wikipedia.org/w/index.php?title=Information_retrieval&oldid=793358396#Average_precision)
