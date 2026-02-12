@@ -280,9 +280,10 @@ precision](https://en.wikipedia.org/w/index.php?title=Information_retrieval&oldi
 
 Adopting each distinct predicted probability ``p_1, p_2, \\ldots, p_k`` for the positive
 class as a soft probability threshold for predicting an actual class, and assuming these
-are arranged in decreasing order, we obtain corresponding recalls ``R_1, R_2, \\ldots,
-R_k`` (monotonically increasing) and precisions ``P_1, P_2, \\ldots, P_k``. Adding an extra
-recall, ``R_{k+1} = 1``, the average precision implemented here is defined as
+thresholds are arranged in decreasing order, we obtain corresponding recalls ``R_1, R_2,
+\\ldots, R_k`` (monotonically increasing) and precisions ``P_1, P_2, \\ldots,
+P_k``. Adding an extra recall, ``R_{k+1} = 1``, the average precision implemented here is
+defined as
 
 ``\\sum_{j=1}^k P_j (R_{j+1} - R_j)``
 
@@ -297,11 +298,9 @@ this is avoided here.
 """
     function average_precision(ŷ, y, positive_class)
 
-Return the average precision.
-
-Here `ŷ` is a vector of predicted numerical probabilities of the specified
-`positive_class`, which is one of two possible values occurring in the provided vector `y`
-of ground truth observations.
+Return the average precision corresponding to a vector `ŷ` of predicted numerical
+probabilities of the specified `positive_class`, which is one of two possible values
+occurring in the accompanying vector `y` of ground truth observations.
 
 $DOC_AVERAGE_PRECISION
 
