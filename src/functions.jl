@@ -136,7 +136,7 @@ function confusion_counts_at_thresholds(scores, y, positive_class)
     thresholds = scores_sort[idx_unique]
 
     # detailed computations with example:
-    # y_sort_bin = [  1   0   0   1   0   0   1]
+    # sorted_labels = [  1   0   0   1   0   0   1]
     # s          = [0.5 0.5 0.2 0.2 0.1 0.1 0.1] thresh are 0.5 0.2, 0.1 // idx [1, 3, 5]
     # ŷ          = [  0   0   0   0   0   0   0] (0.5 - 1.0] # no pos pred
     # ŷ          = [  1   1   0   0   0   0   0] (0.2 - 0.5] # 2 pos pred
