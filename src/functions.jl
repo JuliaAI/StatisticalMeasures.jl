@@ -71,18 +71,11 @@ const DOC_YHAT_Y =
 
 Here `ŷ` is a vector of predicted numerical probabilities of the specified
 `positive_class`, which is one of two possible values occurring in the provided vector
-`y` of ground truth observations.
-
-The returned probability `thresholds` are the distinct values taken on by `ŷ`, listed in
-descending order. In particular, `0` and `1` are only included if they are present in `ŷ`.
-
-"""
-
 DOC_THRESHOLDS(; counts="counts") =
 """
 
-If `thresholds` has length `k`, then there are `k+1` "bins" over which the $counts
-are constant:
+If `thresholds` has length `k`, the interval [0, 1] is partitioned into `k+1` bins.
+The $counts are constant within each bin:
 
 - `[0.0, thresholds[k])`
 - `[thresholds[k], thresholds[k - 1])`
