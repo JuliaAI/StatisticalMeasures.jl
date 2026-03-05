@@ -151,11 +151,12 @@ function confusion_counts_at_thresholds(scores, y, positive_class)
     fp = n_ŷ_pos .- tp               # [1, 2] implicit [0, 1, 2, 4]
 
     # add end points
-    P = cs[end]   # total number of observed positives (3)
-    N = n - P     # total number of observed negatives (4)
-
+    # - First endpoint: threshold > max score → no positive predictions
+    # - Last endpoint: threshold ≤ min score → all samples predicted positive
     tp = [0, tp..., P] # [0, 1, 2, 3]
     fp = [0, fp..., N] # [0, 1, 2, 4]
+    
+    # Derive the remaining confusion matrix entries
     fn = P .- tp       # [3, 2, 1, 0]
     tn = N .- fp       # [4, 3, 2, 0]
 
