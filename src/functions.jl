@@ -173,7 +173,7 @@ classification problem.
 
 $middle
 
-$(DOC_THRESHOLDS(counts="rates"))
+$(DOC_THRESHOLDS(counts="`true_positive_rate` and `false_positive_rate`"))
 
 Accordingly, `true_positive_rates` and `false_positive_rates` have length `k+1` in that
 case.
