@@ -146,7 +146,10 @@ function confusion_counts_at_thresholds(scores, y, positive_class)
     idx_unique_2 = idx_unique[2:end]   # [3, 5]
     n_ŷ_pos      = idx_unique_2 .- 1   # [2, 4] implicit [0, 2, 4, 7]
 
-    cs = cumsum(y_sort_bin)          # [1, 1, 1, 2, 2, 2, 3]
+    # Count total positives and negatives in the dataset
+    cum_positives = cumsum(sorted_labels)   # running count of true positives  # [1, 1, 1, 2, 2, 2, 3]
+    P = cum_positives[end]   # total number of observed positives (3)
+    N = n - P     # total number of observed negatives (4)
     # For each threshold (except the highest), count predictions
     # At a given threshold starting at index i, all samples 1..(i-1) are predicted positive
     # Example: threshold at index 3 → samples 1-2 predicted positive (2 samples)
