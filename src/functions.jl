@@ -133,7 +133,7 @@ function confusion_counts_at_thresholds(scores, y, positive_class)
     y_sort_bin  = (y[ranking] .== positive_class)
 
     idx_unique = _idx_unique_sorted(scores_sort)
-    thresholds = scores_sort[idx_unique]
+    thresholds = sorted_scores[threshold_indices]
 
     # detailed computations with example:
     # sorted_labels = [  1   0   0   1   0   0   1]
