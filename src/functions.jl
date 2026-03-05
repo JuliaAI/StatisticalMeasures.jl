@@ -192,7 +192,7 @@ $(DOC_THRESHOLDS(counts="`true_positive_rate` and `false_positive_rate`"))
 Accordingly, `true_positive_rates` and `false_positive_rates` have length `k+1` in that
 case.
 
-To plot the curve using your favorite plotting backend, do something like
+To plot the curve using your favorite plotting library, do something like
 `plot(false_positive_rates, true_positive_rates)`.
 
 $footer
@@ -243,7 +243,7 @@ $(DOC_THRESHOLDS(counts="precison and recall"))
 
 Accordingly, `precisions` and `recalls` have length `k+1` in that case.
 
-To plot the curve using your favorite plotting backend, do something like
+To plot the curve using your favorite plotting library, do something like
 `plot(recalls, precisions)`.
 
 $footer
