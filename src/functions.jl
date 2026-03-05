@@ -147,7 +147,13 @@ function confusion_counts_at_thresholds(scores, y, positive_class)
     n_ŷ_pos      = idx_unique_2 .- 1   # [2, 4] implicit [0, 2, 4, 7]
 
     cs = cumsum(y_sort_bin)          # [1, 1, 1, 2, 2, 2, 3]
-    tp = cs[n_ŷ_pos]                 # [1, 2] implicit [0, 1, 2, 3]
+    # For each threshold (except the highest), count predictions
+    # At a given threshold starting at index i, all samples 1..(i-1) are predicted positive
+    # Example: threshold at index 3 → samples 1-2 predicted positive (2 samples)
+    n_ŷ_pos = threshold_indices[2:end]  .- 1    # [2, 4] implicit [0, 2, 4, 7]
+    
+    # Compute true positives and false positives 
+    tp = cum_positives[n_ŷ_pos]                 # [1, 2] implicit [0, 1, 2, 3]
     fp = n_ŷ_pos .- tp               # [1, 2] implicit [0, 1, 2, 4]
 
     # add end points
