@@ -142,10 +142,6 @@ function confusion_counts_at_thresholds(scores, y, positive_class)
     # ŷ          = [  1   1   0   0   0   0   0] (0.2 - 0.5] # 2 pos pred
     # ŷ          = [  1   1   1   1   0   0   0] (0.1 - 0.2] # 4 pos pred
     # ŷ          = [  1   1   1   1   1   1   1] [0.0 - 0.1] # all pos pre
-
-    idx_unique_2 = idx_unique[2:end]   # [3, 5]
-    n_ŷ_pos      = idx_unique_2 .- 1   # [2, 4] implicit [0, 2, 4, 7]
-
     # Count total positives and negatives in the dataset
     cum_positives = cumsum(sorted_labels)   # running count of true positives  # [1, 1, 1, 2, 2, 2, 3]
     P = cum_positives[end]   # total number of observed positives (3)
