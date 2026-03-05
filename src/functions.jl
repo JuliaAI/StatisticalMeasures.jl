@@ -130,7 +130,12 @@ function confusion_counts_at_thresholds(scores, y, positive_class)
     ranking = sortperm(scores, rev=true)
 
     scores_sort = scores[ranking]
-    y_sort_bin  = (y[ranking] .== positive_class)
+# Sort samples by score in descending order
+# This lets us easily count predictions by threshold: for any threshold t,
+# all samples with score ≥ t come before those with score < t
+ranking = sortperm(scores, rev=true)
+sorted_scores = scores[ranking]
+sorted_labels  = (y[ranking] .== positive_class)  
 
      # Find where unique thresholds begin
      # Since scores are sorted descending, each unique score value marks a threshold
