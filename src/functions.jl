@@ -132,7 +132,10 @@ function confusion_counts_at_thresholds(scores, y, positive_class)
     scores_sort = scores[ranking]
     y_sort_bin  = (y[ranking] .== positive_class)
 
-    idx_unique = _idx_unique_sorted(scores_sort)
+     # Find where unique thresholds begin
+     # Since scores are sorted descending, each unique score value marks a threshold
+     # Example: scores [0.5, 0.5, 0.2, 0.2, 0.1] → thresholds start at indices [1, 3, 5]
+    threshold_indices = _idx_unique_sorted(sorted_scores)
     thresholds = sorted_scores[threshold_indices]
 
     # detailed computations with example:
