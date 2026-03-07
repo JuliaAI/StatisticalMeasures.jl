@@ -1,41 +1,39 @@
-const ERR_NEED_CATEGORICAL = ArgumentError(
+const ERR_NEED_CATEGORICAL_PR = ArgumentError(
     "Was expecting categorical arguments: "*
-        "In a call like `roc_curve(ŷ, y)`, `ŷ` must have eltype "*
+        "In a call like `precision_recall_curve(ŷ, y)`, `ŷ` must have eltype "*
         "`<:CategoricalDistributions.UnivariateFinite` and `y` must have eltype "*
         "`<:CategoricalArrays.CategoricalArray` . If using raw probabilities, consider "*
-        "using `Functions.roc_curve` instead. "
+        "using `Functions.precision_recall_curve` instead. "
 )
 
-const ERR_ROC1 = ArgumentError(
+const ERR_PR1 = ArgumentError(
     "probabilistic predictions should be for exactly two classes (levels)"
 )
 
-const ERR_ROC2 = ArgumentError(
+const ERR_PR2 = ArgumentError(
     "ground truth observations must have exactly two classes (levels) in the pool"
 )
 
 # perform some argument checks and return the ordered levels:
-function binary_levels(
+function binary_levels_pr(
     yhat::AbstractArray{<:Union{Missing,UnivariateFinite{<:Finite{2}}}},
     y::CategoricalArrays.CatArrOrSub
     )
     classes = CategoricalArrays.levels(y)
-    length(classes) == 2 || throw(ERR_ROC2)
+    length(classes) == 2 || throw(ERR_PR2)
     API.check_numobs(yhat, y)
     API.check_pools(yhat, y)
     warn_unordered(classes)
     classes
 end
-binary_levels(
+binary_levels_pr(
     yhat::AbstractArray{<:Union{Missing,UnivariateFinite{<:Finite}}},
     y::CategoricalArrays.CatArrOrSub
-) = throw(ERR_ROC1)
-binary_levels(yhat, y) = throw(ERR_NEED_CATEGORICAL)
+) = throw(ERR_PR1)
+binary_levels_pr(yhat, y) = throw(ERR_NEED_CATEGORICAL_PR)
 
-const DOC_ROC_EXAMPLE =
+const DOC_PR_EXAMPLE =
 """
-
-# Example
 
 ```
 using StatisticalMeasures
@@ -51,30 +49,32 @@ ŷ = UnivariateFinite(["O", "X"], X_probs, augment=true, pool=y)
 ŷ[1]
 
 using Plots
-false_positive_rates, true_positive_rates, thresholds = roc_curve(ŷ, y)
-plt = plot(false_positive_rates, true_positive_rates; legend=false)
-plot!(plt, xlab="false positive rate", ylab="true positive rate")
-plot!([0, 1], [0, 1], linewidth=2, linestyle=:dash, color=:black)
+recalls, precisions, thresholds = precision_recall_curve(ŷ, y)
+plt = plot(recalls, precisions, legend=false)
+plot!(plt, xlab="recall", ylab="precision")
+
+# proportion of observations that are positive:
+p = precisions[end] # threshold=0
+plot!([0, 1], [p, p], linewidth=2, linestyle=:dash, color=:black)
 ```
 
 """
 
 """
-    roc_curve(ŷ, y) -> false_positive_rates, true_positive_rates, thresholds
+    precision_recall_curve(ŷ, y) -> false_positive_rates, true_positive_rates, thresholds
 
-$(Functions.DOC_ROC(
+$(Functions.DOC_PRECISION_RECALL(
     middle="Here `ŷ` is a vector of `UnivariateFinite` distributions "*
         "(from CategoricalDistributions.jl) over the two "*
         "values taken by the ground truth observations `y`, a `CategoricalVector`. "*
         "The `thresholds`, listed in descending order, are the distinct predicted "*
         "probabilities of the positive class. ",
-    footer="Core algorithm: [`Functions.roc_curve`](@ref)"*
-        "\n\nSee also [`AreaUnderCurve`](@ref). "*DOC_ROC_EXAMPLE,
+    footer="Core algorithm: [`Functions.precision_recall_curve`](@ref). "*DOC_PR_EXAMPLE
 ))
 """
-function roc_curve(yhat, y)
+function precision_recall_curve(yhat, y)
     # `binary_levels` also performs argument checks and issues warnings about order:
-    positive_class = binary_levels(yhat, y) |> last
+    positive_class = binary_levels_pr(yhat, y) |> last
     scores = pdf.(yhat, positive_class)
-    Functions.roc_curve(scores, y, positive_class)
+    Functions.precision_recall_curve(scores, y, positive_class)
 end

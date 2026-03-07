@@ -1,17 +1,15 @@
-API.register(LPLossOnScalars)
-API.register(LPLossOnVectors, "l2")
-metadata = API.measures()[LPLossOnScalars]
-measure = LPLossOnScalars()
+metadata = measures()[LPLoss]
+measure = LPLoss()
 
-@testset "register" begin
-    @test Set(keys(API.measures())) == Set([LPLossOnScalars, LPLossOnVectors])
+@testset "registration" begin
     for trait in API.METADATA_TRAITS
         trait_ex = QuoteNode(trait)
         quote
             @test API.$trait(measure) == getproperty(metadata, $trait_ex)
         end |> eval
     end
-    @test measures()[LPLossOnVectors].aliases == ("l2", )
+    @test measures()[LPLoss].aliases ==
+        ("l1", "l2", "mae", "mav", "mean_absolute_error", "mean_absolute_value")
 end
 
 @testset "search for needle in docstring" begin

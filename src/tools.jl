@@ -59,15 +59,18 @@ function API.check_pools(
     return nothing
 end
 
-# Throw a warning if levels are not explicitly ordered
-function warn_unordered(levels)
-    levels isa CategoricalArray && CategoricalArrays.isordered(levels) && return
+# string to use in warning for unordered levels:
+function warning_unordered(levels)
     raw_levels = CategoricalArrays.unwrap.(levels)
     ret = "Levels not explicitly ordered. "*
         "Using the order $raw_levels. "
     if length(levels) == 2
         ret *= "The \"positive\" level is $(raw_levels[2]). "
     end
-    @warn ret
     return ret
 end
+
+# function to throw warning if `levels` are unordered:
+warn_unordered(levels) = @warn warning_unordered(levels)
+warn_unordered(levels::CategoricalArrays.CatArrOrSub) =
+    CategoricalArrays.isordered(levels) ? nothing : @warn warning_unordered(levels)

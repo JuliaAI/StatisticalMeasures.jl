@@ -1,6 +1,37 @@
 rng = srng(34234)
 
-@testset "ROC" begin
+y = ["0", "1", "1", "1", "1", "1", "1", "0", "0", "0",
+     "1", "0", "0", "0", "1", "1", "0", "1", "1", "0"]
+ŷ = [0.8, 0.9, 0.7, 0.1, 0.7, 0.8, 0.6, 0.7, 0.3, 0.9,
+     0.3, 0.8, 0.6, 0.7, 0.3, 0.9, 0.6, 0.7, 0.1, 0.8]
+
+# sorted versions:
+# ["1", "0", "1", "0", "1", "0", "0", "1", "1", "0",
+#  "0", "1", "1", "0", "0", "0", "1", "1", "1", "1"]
+# [0.9, 0.9, 0.9, 0.8, 0.8, 0.8, 0.8, 0.7, 0.7, 0.7,
+# 0.7, 0.7, 0.6, 0.6, 0.6, 0.3, 0.3, 0.3, 0.1, 0.1]
+
+@testset "confusion_counts_at_thresholds" begin
+    (tn, fp, fn, tp), thresholds = Functions.confusion_counts_at_thresholds(ŷ, y, "1")
+
+    @test thresholds == sort(unique(ŷ)) |> reverse
+
+    P = 11 # num observed positives
+    N = 9  # num observed negatives
+    @test tn == [9, 8, 5, 3, 1, 0, 0]  # hand-computed
+    @test tp == [0, 2, 3, 6, 7, 9, 11] # hand-computed
+    @test all(==(N), tn + fp)
+    @test all(==(P), tp + fn)
+end
+
+@testset "precision_recall_curve" begin
+    recalls, precisions, thresholds = Functions.precision_recall_curve(ŷ, y, "1")
+    @test precisions ≈ [1.0, [2, 3, 6, 7, 9, 11] ./ [3, 7, 12, 15, 18, 20]...]
+    @test recalls ≈ [0, 2, 3, 6, 7, 9, 11]/11
+    @test thresholds == sort(unique(ŷ)) |> reverse
+end
+
+@testset "roc_curve" begin
     y = [  0   0   0   1   0   1   1   0] |> vec
     s = [0.0 0.1 0.1 0.1 0.2 0.2 0.5 0.5] |> vec
 

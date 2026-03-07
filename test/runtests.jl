@@ -21,38 +21,27 @@ call(m, args...) = m(args...)
 
 srng(n=123) = StableRNG(n)
 
-@testset "tools.jl" begin
-    include("tools.jl")
-end
 
-@testset "functions.jl" begin
-    include("functions.jl")
-end
+test_files = [
+    "tools.jl",
+    "functions.jl",
+    "confusion_matrices.jl",
+    "roc.jl",
+    "precision_recall.jl",
+    "continuous.jl",
+    "finite.jl",
+    "probabilistic.jl",
+    "LossFunctionsExt.jl",
+    "ScientificTypesExt.jl",
+    "registry.jl",
+]
 
-@testset "confusion_matrices.jl" begin
-    include("confusion_matrices.jl")
-end
+files = isempty(ARGS) ? test_files : ARGS
 
-@testset "roc.jl" begin
-    include("roc.jl")
-end
-
-@testset "continuous.jl" begin
-    include("continuous.jl")
-end
-
-@testset "finite.jl" begin
-    include("finite.jl")
-end
-
-@testset "probabilistic.jl" begin
-    include("probabilistic.jl")
-end
-
-@testset "LossFunctionsExt.jl" begin
-    include("LossFunctionsExt.jl")
-end
-
-@testset "ScientificTypesExt.jl" begin
-    include("ScientificTypesExt.jl")
+for file in files
+    quote
+        @testset $file begin
+            include($file)
+        end
+    end |> eval
 end

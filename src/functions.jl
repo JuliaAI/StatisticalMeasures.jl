@@ -27,15 +27,26 @@ log_cosh(x::T) where T<:Real = x + _softplus(-2x) - log(convert(T, 2))
 log_cosh_difference(yhat, y) = log_cosh(yhat - y)
 
 
-# # ROC CURVE
+# # CONFUSION MATRIX AT THRESHOLDS
+
 
 """
     _idx_unique_sorted(v)
 
 *Private method.*
 
-Return the index of unique elements in `Real` vector `v` under the assumption that the
-vector `v` is sorted in decreasing order.
+Return the index of the first appearance of each element within `v`, under the untested
+assumption that `v` is sorted in decreasing order.
+
+```julia-repl
+julia> [5, 5, 4, 3, 3, 3, 2, 1] |> _idx_unique_sorted
+5-element Vector{Int64}:
+ 1
+ 3
+ 4
+ 7
+ 8
+```
 
 """
 function _idx_unique_sorted(v)
@@ -55,78 +66,217 @@ function _idx_unique_sorted(v)
     return idx
 end
 
-const DOC_ROC(;middle="", footer="") =
+const DOC_YHAT_Y =
 """
+
+Here `ŷ` is a vector of predicted numerical probabilities of the specified
+`positive_class`, which is one of two possible values occurring in the provided vector
+`y` of ground truth observations.
+
+The returned probability `thresholds` are the distinct values taken on by `ŷ`, listed in
+descending order. In particular, `0` and `1` are only included if they are present in `ŷ`.
+
+"""
+
+DOC_THRESHOLDS(; counts="counts") =
+"""
+
+If `thresholds` has length `k`, the interval [0, 1] is partitioned into `k+1` bins.
+The $counts are constant within each bin:
+
+- `[0.0, thresholds[k])`
+- `[thresholds[k], thresholds[k - 1])`
+- ...
+- `[thresholds[1], 1]`
+
+"""
+
+const DOC_CONFUSION_CHECK = "Assumes there are no more than two classes but does "*
+    "not check this. Does not check that "*
+    "`positive_class` is one of the observed classes. "
+
+const DOC_CONFUSION_AT_THRESHOLDS(;middle=DOC_YHAT_Y, footer=DOC_CONFUSION_CHECK) =
+"""
+
+For a binary classification problem, return probability thresholds and corresponding
+confusion matrix entries, suitable for generating ROC curves and precision-recall curves
+(and variations on these). Primarily intended as a backend for implementations of those
+two cases.
+
+$middle
+
+$(DOC_THRESHOLDS())
+
+Consequently, `TN`, `FP`, `FN` and `TP`, will each have length `k + 1` in that case.
+
+The `j`th raw confusion matrix will be `reshape([TN[j], FP[j], FN[j], TP[j]], 2, 2)`,
+according to conventions used elsewhere in StatisticalMeasures.jl, which explains the
+chosen order for the return value.
+
+$footer
+
+"""
+
+"""
+    Functions.confusion_counts_at_thresholds(ŷ, y, positive_class) ->
+        (TN, FP, FN, TP), thresholds
+
+$(DOC_CONFUSION_AT_THRESHOLDS())
+
+"""
+function confusion_counts_at_thresholds(scores, y, positive_class)
+    n = length(y)
+
+    ranking = sortperm(scores, rev=true)
+
+    scores_sort = scores[ranking]
+# Sort samples by score in descending order
+# This lets us easily count predictions by threshold: for any threshold t,
+# all samples with score ≥ t come before those with score < t
+ranking = sortperm(scores, rev=true)
+sorted_scores = scores[ranking]
+sorted_labels  = (y[ranking] .== positive_class)  
+
+     # Find where unique thresholds begin
+     # Since scores are sorted descending, each unique score value marks a threshold
+     # Example: scores [0.5, 0.5, 0.2, 0.2, 0.1] → thresholds start at indices [1, 3, 5]
+    threshold_indices = _idx_unique_sorted(sorted_scores)
+    thresholds = sorted_scores[threshold_indices]
+
+    # detailed computations with example:
+    # sorted_labels = [  1   0   0   1   0   0   1]
+    # s          = [0.5 0.5 0.2 0.2 0.1 0.1 0.1] thresh are 0.5 0.2, 0.1 // idx [1, 3, 5]
+    # ŷ          = [  0   0   0   0   0   0   0] (0.5 - 1.0] # no pos pred
+    # ŷ          = [  1   1   0   0   0   0   0] (0.2 - 0.5] # 2 pos pred
+    # ŷ          = [  1   1   1   1   0   0   0] (0.1 - 0.2] # 4 pos pred
+    # ŷ          = [  1   1   1   1   1   1   1] [0.0 - 0.1] # all pos pre
+    # Count total positives and negatives in the dataset
+    cum_positives = cumsum(sorted_labels)   # running count of true positives  # [1, 1, 1, 2, 2, 2, 3]
+    P = cum_positives[end]   # total number of observed positives (3)
+    N = n - P     # total number of observed negatives (4)
+    # For each threshold (except the highest), count predictions
+    # At a given threshold starting at index i, all samples 1..(i-1) are predicted positive
+    # Example: threshold at index 3 → samples 1-2 predicted positive (2 samples)
+    n_ŷ_pos = threshold_indices[2:end]  .- 1    # [2, 4] implicit [0, 2, 4, 7]
+    
+    # Compute true positives and false positives 
+    tp = cum_positives[n_ŷ_pos]                 # [1, 2] implicit [0, 1, 2, 3]
+    fp = n_ŷ_pos .- tp               # [1, 2] implicit [0, 1, 2, 4]
+
+    # add end points
+    # - First endpoint: threshold > max score → no positive predictions
+    # - Last endpoint: threshold ≤ min score → all samples predicted positive
+    tp = [0, tp..., P] # [0, 1, 2, 3]
+    fp = [0, fp..., N] # [0, 1, 2, 4]
+    
+    # Derive the remaining confusion matrix entries
+    fn = P .- tp       # [3, 2, 1, 0]
+    tn = N .- fp       # [4, 3, 2, 0]
+
+    return (tn, fp, fn, tp), thresholds
+end
+
+
+# # ROC CURVE
+
+const DOC_ROC(;middle=DOC_YHAT_Y, footer=DOC_CONFUSION_CHECK) =
+"""
+
 Return data for plotting the receiver operator characteristic (ROC curve) for a binary
 classification problem.
 
 $middle
 
-If there are `k` unique probabilities, then there are correspondingly `k` thresholds
-and `k+1` "bins" over which the false positive and true positive rates are constant.:
+$(DOC_THRESHOLDS(counts="`true_positive_rate` and `false_positive_rate`"))
 
-- `[0.0 - thresholds[1]]`
-- `[thresholds[1] - thresholds[2]]`
-- ...
-- `[thresholds[k] - 1]`
+Accordingly, `true_positive_rates` and `false_positive_rates` have length `k+1` in that
+case.
 
-Consequently, `true_positive_rates` and `false_positive_rates` have length `k+1` if
-`thresholds` has length `k`.
-
-To plot the curve using your favorite plotting backend, do something like
+To plot the curve using your favorite plotting library, do something like
 `plot(false_positive_rates, true_positive_rates)`.
 
 $footer
 """
 
 """
-    Functions.roc_curve(probs_of_positive, ground_truth_obs, positive_class) ->
+    Functions.roc_curve(ŷ, y, positive_class) ->
         false_positive_rates, true_positive_rates, thresholds
 
 $(DOC_ROC())
 
-Assumes there are no more than two classes but does not check this. Does not check that
-`positive_class` is one of the observed classes.
+For a method with checks, see [`StatisticalMeasures.roc_curve`](@ref). See also
+[`Functions.confusion_counts_at_thresholds`](@ref).
 
 """
 function roc_curve(scores, y, positive_class)
-    n = length(y)
+    (tn, fp, fn, tp), thresholds =
+        confusion_counts_at_thresholds(scores, y, positive_class)
 
-    ranking = sortperm(scores, rev=true)
+    N = tn[1] # num observed negatives
+    P = fn[1] # num observed positives
 
-    scores_sort = scores[ranking]
-    y_sort_bin  = (y[ranking] .== positive_class)
+    tpr = tp ./ P
+    fpr = fp ./ N
 
-    idx_unique = _idx_unique_sorted(scores_sort)
-    thresholds = scores_sort[idx_unique]
-
-    # detailed computations with example:
-    # y = [  1   0   0   1   0   0   1]
-    # s = [0.5 0.5 0.2 0.2 0.1 0.1 0.1] thresh are 0.5 0.2, 0.1 // idx [1, 3, 5]
-    # ŷ = [  0   0   0   0   0   0   0] (0.5 - 1.0] # no pos pred
-    # ŷ = [  1   1   0   0   0   0   0] (0.2 - 0.5] # 2 pos pred
-    # ŷ = [  1   1   1   1   0   0   0] (0.1 - 0.2] # 4 pos pred
-    # ŷ = [  1   1   1   1   1   1   1] [0.0 - 0.1] # all pos pre
-
-    idx_unique_2 = idx_unique[2:end]   # [3, 5]
-    n_ŷ_pos      = idx_unique_2 .- 1   # [2, 4] implicit [0, 2, 4, 7]
-
-    cs   = cumsum(y_sort_bin)          # [1, 1, 1, 2, 2, 2, 3]
-    n_tp = cs[n_ŷ_pos]                 # [1, 2] implicit [0, 1, 2, 3]
-    n_fp = n_ŷ_pos .- n_tp             # [1, 2] implicit [0, 1, 2, 4]
-
-    # add end points
-    P = sum(y_sort_bin) # total number of true positives
-    N = n - P           # total number of true negatives
-
-    n_tp = [0, n_tp..., P] # [0, 1, 2, 3]
-    n_fp = [0, n_fp..., N] # [0, 1, 2, 4]
-
-    tprs = n_tp ./ P  # [0/3, 1/3, 2/3, 1]
-    fprs = n_fp ./ N  # [0/4, 1/4, 2/4, 1]
-
-    return fprs, tprs, thresholds
+    return fpr, tpr, thresholds
 end
+
+
+# # PRECISION RECALL CURVE
+
+tamed_divide(a, b) = b == 0 ? 0 : a/b
+
+const DOC_ROC_CHECK = DOC_CONFUSION_CHECK*
+    "That failing to be the case, each returned recall will be `Inf` or `NaN`. "
+
+const DOC_PRECISION_RECALL(;middle=DOC_YHAT_Y, footer=DOC_ROC_CHECK) =
+"""
+
+Return data for plotting the precision-recall curve (PR curve) for a binary classification
+problem. The first point on the corresponding curve is always `(recall, precision) = (0,
+1)`, while the last point is always `(recall, precision) = (1, p)` where `p` is the
+proportion of positives in the observed sample `y`.
+
+$middle
+
+$(DOC_THRESHOLDS(counts="precison and recall"))
+
+Accordingly, `precisions` and `recalls` have length `k+1` in that case.
+
+To plot the curve using your favorite plotting library, do something like
+`plot(recalls, precisions)`.
+
+$footer
+"""
+
+"""
+    Functions.precision_recall_curve(ŷ, y, positive_class) ->
+        precisions, recalls, thresholds
+
+$(DOC_PRECISION_RECALL())
+
+See also [`StatisticalMeasures.precision_recall_curve`](@ref), which includes some
+checks, and [`Functions.confusion_counts_at_thresholds`](@ref).
+
+"""
+function precision_recall_curve(scores, y, positive_class)
+    (tn, fp, fn, tp), thresholds =
+        confusion_counts_at_thresholds(scores, y, positive_class)
+
+    k = length(tp)
+    precisions = Vector{Float64}(undef, k)
+    @. precisions = tamed_divide(tp, tp + fp)
+    # force precision = 1 at threshold -> 1:
+    precisions[1] = 1
+
+    recalls = Vector{Float64}(undef, k)
+    P = fn[1] # num observed positives
+    @. recalls = tp / P
+    return recalls, precisions, thresholds
+end
+
+
+# # AUC
 
 const DOC_AUC_REF =
     "Implementation is based on the Mann-Whitney U statistic.  See the "*
@@ -251,14 +401,14 @@ end
 
 """
     Functions.cbi(
-        probability_of_positive, ground_truth_observations, positive_class, 
+        probability_of_positive, ground_truth_observations, positive_class,
         nbins, binwidth, ma=maximum(scores), mi=minimum(scores), cor=corspearman
     )
     Return the Continuous Boyce Index (CBI) for a vector of probabilities and ground truth observations.
 
 """
 function cbi(
-    scores, y, positive_class; 
+    scores, y, positive_class;
     verbosity, nbins, binwidth,
     max=maximum(scores), min=minimum(scores), cor=StatsBase.corspearman
 )
@@ -282,7 +432,7 @@ function cbi(
             any_empty = true
         end
         @inbounds for j in bin_index_first:bin_index_last
-            if sorted_y[j] == positive_class 
+            if sorted_y[j] == positive_class
                 n_positive[i] += 1
             end
         end
@@ -552,7 +702,7 @@ $(docstring(
     "Functions.multiclass_fscore",
     sig="(m, β, average[, weights])",
     the=true,
-))*"\n Note that the `MicroAvg` score is insenstive to `β`. "
+))*"\n Note that the `MicroAvg` score is insensitive to `β`. "
 """
 multiclass_fscore(m, beta, average::MicroAvg) =
     multiclass_true_positive_rate(m, MicroAvg())
