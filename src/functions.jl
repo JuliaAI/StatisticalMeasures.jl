@@ -288,7 +288,7 @@ piece-wise linear approximation. Generally, differences between the two are only
 when the number of observations is small, but it is faster to compute average precision.
 
 Reference: Wikipedia entry, [Average
-precision](https://en.wikipedia.org/w/index.php?title=Information_retrieval&oldid=793358396#Average_precision)
+precision](https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#Average_precision)
 
 # Definition
 
