@@ -61,7 +61,7 @@ plot!([0, 1], [p, p], linewidth=2, linestyle=:dash, color=:black)
 """
 
 """
-    precision_recall_curve(ŷ, y) -> false_positive_rates, true_positive_rates, thresholds
+    precision_recall_curve(ŷ, y) -> recalls, precisions, thresholds
 
 $(Functions.DOC_PRECISION_RECALL(
     middle="Here `ŷ` is a vector of `UnivariateFinite` distributions "*
