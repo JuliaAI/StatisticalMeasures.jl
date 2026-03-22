@@ -61,6 +61,63 @@ function l2_check(measure, yhat, y, weight_args...)
 end
 
 # ---------------------------------------------------------
+# AveragePrecision
+
+struct _AveragePrecision end
+
+function (m::_AveragePrecision)(ŷ::AbstractArray{<:UnivariateFinite}, y)
+    classes = CategoricalArrays.levels(first(ŷ))
+    warn_unordered(classes)
+    positive_class = last(classes)
+    scores = pdf.(ŷ, positive_class)
+
+    Functions.average_precision(scores, y, positive_class)
+end
+
+AveragePrecision() = _AveragePrecision() |> robust_measure |> fussy_measure
+
+const AveragePrecisionType = API.FussyMeasure{
+    <:API.RobustMeasure{<:_AveragePrecision}
+}
+
+@fix_show AveragePrecision::AveragePrecisionType
+
+# `AveragePrecision` will inherit traits from `_AveragePrecision`:
+@trait(_AveragePrecision,
+       consumes_multiple_observations=true,
+       observation_scitype = OrderedFactor{2},
+       kind_of_proxy=LearnAPI.Distribution(),
+       orientation=Score(),
+       external_aggregation_mode=Mean(),
+       human_name = "average precision",
+)
+
+register(AveragePrecision, "average_precision")
+
+const AveragePrecisionDoc = docstring(
+    "AveragePrecision()",
+    body=
+"""
+It is expected that `ŷ` be a vector of distributions over the binary set of unique
+elements of `y`; specifically, `ŷ` should have eltype `<:UnivariateFinite` from the
+CategoricalDistributions.jl package.
+
+$(Functions.DOC_AVERAGE_PRECISION)
+
+Core implementation: [`Functions.average_precision`](@ref).
+
+""",
+    scitype = "",
+    footer="See also [`precision_recall_curve`](@ref). ",
+)
+
+"$AveragePrecisionDoc"
+AveragePrecision
+"$AveragePrecisionDoc"
+const average_precision = AveragePrecision()
+
+
+# ---------------------------------------------------------
 # AreaUnderCurve
 
 struct _AreaUnderCurve  end
@@ -121,6 +178,74 @@ AreaUnderCurve
 const auc = AreaUnderCurve()
 "$AreaUnderCurveDoc"
 const area_under_curve = auc
+
+
+# ---------------------------------------------------------
+# PrecisionAtFixedRecall
+
+struct _PrecisionAtFixedRecall{R<:Real}
+    recall_threshold::R
+end
+
+function (m::_PrecisionAtFixedRecall)(ŷ::AbstractArray{<:UnivariateFinite}, y)
+
+    classes = CategoricalArrays.levels(first(ŷ))
+    warn_unordered(classes)
+    positive_class = last(classes)
+    scores = pdf.(ŷ, positive_class)
+
+    Functions.precision_at_fixed_recall(
+        scores,
+        y,
+        positive_class;
+        recall_threshold=m.recall_threshold,
+    )
+
+end
+
+PrecisionAtFixedRecall(recall_threshold) =
+    _PrecisionAtFixedRecall(recall_threshold) |> robust_measure |> fussy_measure
+PrecisionAtFixedRecall(; recall_threshold=0.95) = PrecisionAtFixedRecall(recall_threshold)
+
+const PrecisionAtFixedRecallType = API.FussyMeasure{
+    <:API.RobustMeasure{<:_PrecisionAtFixedRecall}
+}
+
+@fix_show PrecisionAtFixedRecall::PrecisionAtFixedRecallType
+
+# `PrecisionAtFixedRecall` will inherit traits from `_PrecisionAtFixedRecall`:
+@trait(_PrecisionAtFixedRecall,
+       consumes_multiple_observations=true,
+       observation_scitype = OrderedFactor{2},
+       kind_of_proxy=LearnAPI.Distribution(),
+       orientation=Score(),
+       external_aggregation_mode=Mean(),
+       human_name = "precision at fixed recall",
+)
+
+register(PrecisionAtFixedRecall, "precision_at_fixed_recall")
+
+const PrecisionAtFixedRecallDoc = docstring(
+    "PrecisionAtFixedRecall(; recall_threshold=0.95)",
+    body=
+"""
+It is expected that `ŷ` be a vector of distributions over the binary set of unique
+elements of `y`; specifically, `ŷ` should have eltype `<:UnivariateFinite` from the
+CategoricalDistributions.jl package.
+
+$(Functions.DOC_PRECISION_AT_FIXED_RECALL )
+
+Core implementation: [`Functions.precision_at_fixed_recall`](@ref).
+
+""",
+    scitype = "",
+    footer="See also [`precision_recall_curve`](@ref). ",
+)
+
+"$PrecisionAtFixedRecallDoc"
+PrecisionAtFixedRecall
+"$PrecisionAtFixedRecallDoc"
+const precision_at_fixed_recall = PrecisionAtFixedRecall()
 
 
 # ---------------------------------------------------------------------
@@ -548,33 +673,47 @@ const spherical_score = SphericalScore()
 
 # ---------------------------------------------------------------------
 # Continuous Boyce Index
-struct _ContinuousBoyceIndex 
+struct _ContinuousBoyceIndex
     verbosity::Int
     nbins::Integer
     binwidth::Float64
     min::Float64
     max::Float64
     cor::Function
-    function _ContinuousBoyceIndex(; 
-        verbosity = 1, nbins = 101, binwidth = 0.1, 
+    function _ContinuousBoyceIndex(;
+        verbosity = 1, nbins = 101, binwidth = 0.1,
         min = 0, max = 1, cor = StatsBase.corspearman
     )
         new(verbosity, nbins, binwidth, min, max, cor)
     end
 end
 
-ContinuousBoyceIndex(; kw...) = _ContinuousBoyceIndex(; kw...) |> robust_measure |> fussy_measure
+ContinuousBoyceIndex(; kw...) =
+    _ContinuousBoyceIndex(; kw...) |> robust_measure |> fussy_measure
 
-function (m::_ContinuousBoyceIndex)(ŷ::AbstractArray{<:UnivariateFinite}, y::NonMissingCatArrOrSub)
+function (m::_ContinuousBoyceIndex)(
+    ŷ::AbstractArray{<:UnivariateFinite},
+    y::NonMissingCatArrOrSub,
+    )
     m.verbosity > 0 && warn_unordered(levels(y))
     positive_class = levels(first(ŷ))|> last
     scores = pdf.(ŷ, positive_class)
 
-    return Functions.cbi(scores, y, positive_class; 
-        verbosity = m.verbosity, nbins = m.nbins, binwidth = m.binwidth, max = m.max, min = m.min, cor = m.cor)
+    return Functions.cbi(
+        scores,
+        y,
+        positive_class;
+        verbosity = m.verbosity,
+        nbins = m.nbins,
+        binwidth = m.binwidth,
+        max = m.max,
+        min = m.min,
+        cor = m.cor,
+    )
 end
 
-const ContinuousBoyceIndexType = API.FussyMeasure{<:API.RobustMeasure{<:_ContinuousBoyceIndex}}
+const ContinuousBoyceIndexType =
+    API.FussyMeasure{<:API.RobustMeasure{<:_ContinuousBoyceIndex}}
 
 @fix_show ContinuousBoyceIndex::ContinuousBoyceIndexType
 
@@ -591,27 +730,37 @@ StatisticalMeasures.@trait(
 register(ContinuousBoyceIndex, "continuous_boyce_index", "cbi")
 
 const ContinuousBoyceIndexDoc = docstring(
-    "ContinuousBoyceIndex(; verbosity=1, nbins=101, bin_overlap=0.1, min=nothing, max=nothing, cor=StatsBase.corspearman)",
+    "ContinuousBoyceIndex(; verbosity=1, nbins=101, bin_overlap=0.1, "*
+        "min=nothing, max=nothing, cor=StatsBase.corspearman)",
     body=
 """
-The Continuous Boyce Index is a measure for evaluating the performance of probabilistic predictions for binary classification, 
-especially for presence-background data in ecological modeling. 
-It compares the predicted probability scores for the positive class across bins, giving higher scores if the ratio of positive
-    and negative samples in each bin is strongly correlated to the value at that bin.
+
+The Continuous Boyce Index is a measure for evaluating the performance of probabilistic
+predictions for binary classification, especially for presence-background data in
+ecological modeling.  It compares the predicted probability scores for the positive class
+across bins, giving higher scores if the ratio of positive and negative samples in each
+bin is strongly correlated to the value at that bin.
 
 ## Keywords
+
 - `verbosity`: Verbosity level.
+
 - `nbins`: Number of bins to use for score partitioning.
+
 - `binwidth`: The width of each bin, which defaults to 0.1.
-- `min`, `max`: Optional minimum and maximum score values for binning. Default to the 0 and 1, respectively.
+
+- `min`, `max`: Optional minimum and maximum score values for binning. Default to the 0
+  and 1, respectively.
+
 - `cor`: Correlation function (defaults to StatsBase.corspearman, i.e. Spearman correlation).
 
 ## Arguments
 
-The predictions `ŷ` should be a vector of `UnivariateFinite` distributions from CategoricalDistributions.jl, 
-    and `y` a CategoricalVector of ground truth labels.
+The predictions `ŷ` should be a vector of `UnivariateFinite` distributions from
+CategoricalDistributions.jl, and `y` a CategoricalVector of ground truth labels.
 
-Returns the correlation between the ratio of positive to negative samples in each bin and the bin centers.
+Returns the correlation between the ratio of positive to negative samples in each bin and
+the bin centers.
 
 Core implementation: [`Functions.cbi`](@ref).
 

@@ -18,8 +18,8 @@ ŷ[1]
 
 ```julia
 using Plots
-curve = roc_curve(ŷ, y)
-plt = plot(curve, legend=false)
+false_positive_rates, true_positive_rates, thresholds = roc_curve(ŷ, y)
+plt = plot(false_positive_rates, true_positive_rates; legend=false)
 plot!(plt, xlab="false positive rate", ylab="true positive rate")
 plot!([0, 1], [0, 1], linewidth=2, linestyle=:dash, color=:black)
 ```

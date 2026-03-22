@@ -1345,9 +1345,11 @@ const MulticlassFScoreDoc = docstring(
     scitype=DOC_ORDERED_FACTOR_BINARY,
     body=
         """
-        \n\nThis is an averaged one-versus-rest version of the binary
-        [`FScore`](@ref). Or it can return a dictionary keyed
-        on target class (or a vector); see `average` options below.
+
+        \n\nThis is an averaged one-versus-rest version of the binary [`FScore`](@ref). Or
+        it can return a dictionary keyed on target class (or a vector); see `average`
+        options below. The `levels` and `rev` options have no effect unless
+        `average=NoAvg()`.
 
         $(ConfusionMatrices.DOC_OPTIMISED)
 

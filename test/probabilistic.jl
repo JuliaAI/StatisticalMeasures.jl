@@ -1,3 +1,22 @@
+@testset "AveragePrecision" begin
+    y = categorical(["O", "X", "X", "X", "X", "O", "O", "O", "X", "X"], ordered=true)
+    scores = [0.3, 0.2, 0.4, 0.9, 0.1, 0.4, 0.5, 0.2, 0.8, 0.7]
+    ŷ = UnivariateFinite(["O", "X"], scores, augment=true, pool=y)
+    core = Functions.average_precision(scores, y, "X")
+    wrapped = @test_logs AveragePrecision()(ŷ, y)
+    aliased = average_precision(ŷ, y)
+    @test  core == wrapped == aliased
+
+    # unordered case:
+    y = categorical(["O", "X", "X", "X", "X", "O", "O", "O", "X", "X"])
+    ŷ = UnivariateFinite(["O", "X"], scores, augment=true, pool=y)
+    wrapped = @test_logs(
+        (:warn, StatisticalMeasures.warning_unordered(levels(y))),
+        AveragePrecision()(ŷ, y),
+    )
+    @test wrapped == core
+end
+
 @testset "AreaUnderCurve" begin
     # this is random binary and random scores generated with numpy
     # then using roc_auc_score from sklearn to get the AUC
@@ -50,6 +69,26 @@ end
     y = categorical([missing, 'a', 'b', 'a'])
     @test !(y isa StatisticalMeasures.NonMissingCatArrOrSub)
     @test !(view(y, 1:2) isa StatisticalMeasures.NonMissingCatArrOrSub)
+end
+
+@testset "PrecisionAtFixedRecall" begin
+    y = categorical(["O", "X", "X", "X", "X", "O", "O", "O", "X", "X"], ordered=true)
+    scores = [0.3, 0.2, 0.4, 0.9, 0.1, 0.4, 0.5, 0.2, 0.8, 0.7]
+    ŷ = UnivariateFinite(["O", "X"], scores, augment=true, pool=y)
+    recall_thresholds = [0.1, 0.2, 0.4, 0.51, 0.74, 0.95]
+    for recall_threshold in recall_thresholds
+        core = Functions.precision_at_fixed_recall(scores, y, "X"; recall_threshold)
+        wrapped = @test_logs PrecisionAtFixedRecall(; recall_threshold)(ŷ, y)
+        @test core == wrapped
+    end
+
+    # check warning issued in unordered case:
+    y = categorical(["O", "X", "X", "X", "X", "O", "O", "O", "X", "X"])
+    ŷ = UnivariateFinite(["O", "X"], scores, augment=true, pool=y)
+    @test_logs(
+        (:warn, StatisticalMeasures.warning_unordered(levels(y))),
+        PrecisionAtFixedRecall(0.4)(ŷ, y),
+    )
 end
 
 @testset "Log, Brier, Spherical - finite case" begin
@@ -185,14 +224,14 @@ end
     # Simple synthetic test: perfectly separates positives and negatives
     c = ["neg", "pos"]
     probs = repeat(0.0:0.1:0.9, inner = 10) .+ rand(rng, 100) .* 0.1
-    y = categorical(probs .> rand(rng, 100))
+    y = categorical(probs .> rand(rng, 100), ordered=true)
     ŷ = UnivariateFinite(levels(y), probs, augment=true)
     # Should be pretty high
     @test cbi(ŷ, y) ≈ 0.87 atol=0.01
 
     # Passing different correlation methods works
     @test ContinuousBoyceIndex(cor=cor)(ŷ, y) ≈ 0.90 atol = 0.01
-    @test ContinuousBoyceIndex(nbins = 11, binwidth = 0.03)(ŷ, y) ≈ 0.77 atol = 0.01 
+    @test ContinuousBoyceIndex(nbins = 11, binwidth = 0.03)(ŷ, y) ≈ 0.77 atol = 0.01
 
     # Randomized test: shuffled labels, should be near 0
     y_shuf = copy(y)
@@ -204,27 +243,28 @@ end
     @test isapprox(cbi(ŷ[idx], y[idx]), cbi(ŷ, y), atol=1e-8)
 
     # Test with all positives or all negatives return NaN
-    y_allpos = categorical(trues(100), levels = levels(y))
-    y_allneg = categorical(falses(100), levels = levels(y))
+    y_allpos = categorical(trues(100), levels = levels(y), ordered=true)
+    y_allneg = categorical(falses(100), levels = levels(y), ordered=true)
     @test isnan(cbi(ŷ, y_allpos))
     @test isnan(cbi(ŷ, y_allneg))
 
-    unordered_warning = StatisticalMeasures.warn_unordered([false, true])
+    yunordered = categorical(y, ordered=false)
+    unordered_warning = StatisticalMeasures.warning_unordered([false, true])
     @test_logs(
         (:warn, unordered_warning),
-        cbi(ŷ, y),
+        cbi(ŷ, yunordered),
      )
 
     cbi_dropped_bins = @test_logs(
-        (:warn, unordered_warning), (:info, "removing 91 bins without any observations",),
+        (:info, "removing 91 bins without any observations"),
         ContinuousBoyceIndex(; verbosity = 2, min =0.0, max = 2.0, nbins = 191)(ŷ, y),
     )
     # These two are identical because bins are dropped
-    @test cbi_dropped_bins == 
+    @test cbi_dropped_bins ==
         ContinuousBoyceIndex(; min = 0.0, max = 1.2, nbins = 111)(ŷ, y)
-    
+
     # cbi is silent for verbosity 0
-    @test_logs ContinuousBoyceIndex(; verbosity = 0)(ŷ, y)
+    @test_logs ContinuousBoyceIndex(; verbosity = 0)(ŷ, yunordered)
 end
 
 @testset "l2_check" begin
