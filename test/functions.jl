@@ -107,6 +107,7 @@ end
     # extreme thresholds:
     @test Functions.precision_at_fixed_recall(yhat, y, "X"; recall_threshold=0.9)==0
     @test Functions.precision_at_fixed_recall(yhat, y, "X"; recall_threshold=1)==0
+    @test Functions.precision_at_fixed_recall(yhat, y, "X"; recall_threshold=1.2)==0
 
     # comparing with hand calculation, example two
     y = ["X", "O", "X", "X", "O", "X", "X", "O", "O", "X"]
