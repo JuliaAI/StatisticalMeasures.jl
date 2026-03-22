@@ -88,9 +88,9 @@ function DOC_OPTIONS(; binary=false, return_type=false, average=false, beta=fals
     ret *= !average ? "" :
         """
 
-        - `average=MacroAvg()`: one of: `NoAvg()`, `MacroAvg()`, `MicroAvg()` (names owned
-          and exported by StatisticalMeasuresBase.jl.) See J. Opitz and S. Burst
-          [(2019)](https://arxiv.org/abs/1911.03347). "Macro F1 and Macro F1", *arXiv*.
+        - `average=MacroAvg()`: one of: `NoAvg()`, `MacroAvg()`, `MicroAvg()`. See
+          J. Opitz and S. Burst [(2019)](https://arxiv.org/abs/1911.03347). "Macro F1 and
+          Macro F1", *arXiv*.
 
         """
     ret *= !return_type ? "" :
