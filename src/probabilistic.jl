@@ -180,6 +180,74 @@ const auc = AreaUnderCurve()
 const area_under_curve = auc
 
 
+# ---------------------------------------------------------
+# PrecisionAtFixedRecall
+
+struct _PrecisionAtFixedRecall{R<:Real}
+    recall_threshold::R
+end
+
+function (m::_PrecisionAtFixedRecall)(ŷ::AbstractArray{<:UnivariateFinite}, y)
+
+    classes = CategoricalArrays.levels(first(ŷ))
+    warn_unordered(classes)
+    positive_class = last(classes)
+    scores = pdf.(ŷ, positive_class)
+
+    Functions.precision_at_fixed_recall(
+        scores,
+        y,
+        positive_class;
+        recall_threshold=m.recall_threshold,
+    )
+
+end
+
+PrecisionAtFixedRecall(recall_threshold) =
+    _PrecisionAtFixedRecall(recall_threshold) |> robust_measure |> fussy_measure
+PrecisionAtFixedRecall(; recall_threshold=0.95) = PrecisionAtFixedRecall(recall_threshold)
+
+const PrecisionAtFixedRecallType = API.FussyMeasure{
+    <:API.RobustMeasure{<:_PrecisionAtFixedRecall}
+}
+
+@fix_show PrecisionAtFixedRecall::PrecisionAtFixedRecallType
+
+# `PrecisionAtFixedRecall` will inherit traits from `_PrecisionAtFixedRecall`:
+@trait(_PrecisionAtFixedRecall,
+       consumes_multiple_observations=true,
+       observation_scitype = OrderedFactor{2},
+       kind_of_proxy=LearnAPI.Distribution(),
+       orientation=Score(),
+       external_aggregation_mode=Mean(),
+       human_name = "precision at fixed recall",
+)
+
+register(PrecisionAtFixedRecall, "precision_at_fixed_recall")
+
+const PrecisionAtFixedRecallDoc = docstring(
+    "PrecisionAtFixedRecall(; recall_threshold=0.95)",
+    body=
+"""
+It is expected that `ŷ` be a vector of distributions over the binary set of unique
+elements of `y`; specifically, `ŷ` should have eltype `<:UnivariateFinite` from the
+CategoricalDistributions.jl package.
+
+$(Functions.DOC_PRECISION_AT_FIXED_RECALL )
+
+Core implementation: [`Functions.precision_at_fixed_recall`](@ref).
+
+""",
+    scitype = "",
+    footer="See also [`precision_recall_curve`](@ref). ",
+)
+
+"$PrecisionAtFixedRecallDoc"
+PrecisionAtFixedRecall
+"$PrecisionAtFixedRecallDoc"
+const precision_at_fixed_recall = PrecisionAtFixedRecall()
+
+
 # ---------------------------------------------------------------------
 # LogScore
 

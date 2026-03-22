@@ -71,6 +71,9 @@ $(Functions.DOC_PRECISION_RECALL(
         "probabilities of the positive class. ",
     footer="Core algorithm: [`Functions.precision_recall_curve`](@ref). "*DOC_PR_EXAMPLE
 ))
+
+See also [`PrecisionAtFixedRecall`](@ref).
+
 """
 function precision_recall_curve(yhat, y)
     # `binary_levels` also performs argument checks and issues warnings about order:

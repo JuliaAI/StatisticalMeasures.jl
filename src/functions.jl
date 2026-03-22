@@ -383,6 +383,83 @@ function auc(scores, y, positive_class)
 end
 
 
+# # PRECISION AT FIXED RECALL
+
+const DOC_PRECISION_AT_FIXED_RECALL = """
+
+This metric is useful, in applications such as toxicity detection, anomaly detection, and
+screening for disease markers, if one wants a cap on the proportion of positives that are
+misclassified (one minus the recall) while minimizing the rate of false alarms (one minus
+the precision).
+
+More precisely, the measure:
+
+1. Determines all values of the recall, as one varies the probability threshold for a positive outcome over all predicted probabilities for that class.
+
+2. Among these recalls, finds the smallest one that exceeds or equals `recall_threshold`.
+
+3. Returns the corresponding precision for that recall.
+
+In the event there are multiple precisions for the same recall, the mean precision is
+returned. In the event no recall is found in Step 2, a precision of `0` is returned.
+
+"""
+
+"""
+```
+precision_at_fixed_recall(ŷ, y, positive_class; recall_threshold=0.95)
+```
+
+Returns the precision for a fixed recall.
+
+$DOC_PRECISION_AT_FIXED_RECALL
+
+Here `ŷ` is a vector of predicted numerical probabilities of the specified
+`positive_class`, which is one of two possible values occurring in the provided vector `y`
+of ground truth observations.
+
+$DOC_CONFUSION_CHECK
+
+"""
+function precision_at_fixed_recall(
+    ŷ,
+    y,
+    positive_class;
+    recall_threshold=0.95,
+    )
+
+    recalls, precisions, _ = precision_recall_curve(ŷ, y, positive_class)
+
+    # Note: `recalls` is automatically sorted in increasing order.
+
+    # The last elements don't correspond to an actual prediction, but are added to ensure
+    # one always has a precision for recall=1, for plotting purposes. So we drop these
+    # here:
+    recalls = @view recalls[1:end-1]
+    precisions = @view precisions[1:end-1]
+
+    recall_threshold <= 1 || return 0
+
+    i1 = findfirst(>=(recall_threshold), recalls)
+    isnothing(i1) && return 0
+
+    n = length(recalls)
+    r = recalls[i1]
+
+    # initialize sum of precisions:
+    p = precisions[i1]
+
+    i = i1 + 1
+    while i <= n && recalls[i] == r
+        p += precisions[i]
+        i += 1
+    end
+
+    # return the mean precision encountered:
+    return p / (i - i1)
+end
+
+
 # # FUNCTIONS ON MATRICES INTERPRETED AS CONFUSION MATRICES
 
 clean(s) = join(split(last(split(s, ".")), "_"), " ")
