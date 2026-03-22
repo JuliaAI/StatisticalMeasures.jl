@@ -366,7 +366,7 @@ function precision_at_fixed_recall(
     recalls = @view recalls[1:end-1]
     precisions = @view precisions[1:end-1]
 
-    recall_threshold <= 1 || !isempty(recalls) || return 0
+    recall_threshold <= 1 || return 0
 
     i1 = findfirst(>=(recall_threshold), recalls)
     isnothing(i1) && return 0
