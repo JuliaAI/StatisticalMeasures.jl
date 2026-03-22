@@ -74,7 +74,7 @@ function (m::_AveragePrecision)(ŷ::AbstractArray{<:UnivariateFinite}, y)
     Functions.average_precision(scores, y, positive_class)
 end
 
-const AveragePrecision() = _AveragePrecision() |> robust_measure |> fussy_measure
+AveragePrecision() = _AveragePrecision() |> robust_measure |> fussy_measure
 
 const AveragePrecisionType = API.FussyMeasure{
     <:API.RobustMeasure{<:_AveragePrecision}

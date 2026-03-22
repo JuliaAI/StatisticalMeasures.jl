@@ -336,11 +336,12 @@ function average_precision(ŷ, y, positive_class)
     # We ignore the last precision, as this does not correspond to any predicted
     # probability, but is rather an artifact to ensure precision-recall curves always have
     # a recall=1 point. See the definition in the docstring.
-    for i in 1:length(precisions[1:(end -1)])
+    # `precison` and `recall` are `Vector` type object so they have fast linear indexing starting from 1.
+    for i in Base.OneTo(length(precisions)-1)
         r_next = recalls[i + 1]
         Δr = r_next - r
         r = r_next
-        area += precisions[i]*Δr
+        area = muladd(precisions[i], Δr, area)
     end
 
     return area
