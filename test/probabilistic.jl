@@ -1,3 +1,22 @@
+@testset "AveragePrecision" begin
+    y = categorical(["O", "X", "X", "X", "X", "O", "O", "O", "X", "X"], ordered=true)
+    scores = [0.3, 0.2, 0.4, 0.9, 0.1, 0.4, 0.5, 0.2, 0.8, 0.7]
+    ŷ = UnivariateFinite(["O", "X"], scores, augment=true, pool=y)
+    core = Functions.average_precision(scores, y, "X")
+    wrapped = @test_logs AveragePrecision()(ŷ, y)
+    aliased = average_precision(ŷ, y)
+    @test  core == wrapped == aliased
+
+    # unordered case:
+    y = categorical(["O", "X", "X", "X", "X", "O", "O", "O", "X", "X"])
+    ŷ = UnivariateFinite(["O", "X"], scores, augment=true, pool=y)
+    wrapped = @test_logs(
+        (:warn, StatisticalMeasures.warning_unordered(levels(y))),
+        AveragePrecision()(ŷ, y),
+    )
+    @test wrapped == core
+end
+
 @testset "AreaUnderCurve" begin
     # this is random binary and random scores generated with numpy
     # then using roc_auc_score from sklearn to get the AUC
