@@ -146,7 +146,7 @@ function (m::_PrecisionAtFixedRecall)(ŷ::AbstractArray{<:UnivariateFinite}, y)
 
 end
 
-const PrecisionAtFixedRecall(recall_threshold) =
+PrecisionAtFixedRecall(recall_threshold) =
     _PrecisionAtFixedRecall(recall_threshold) |> robust_measure |> fussy_measure
 PrecisionAtFixedRecall(; recall_threshold=0.95) = PrecisionAtFixedRecall(recall_threshold)
 

@@ -108,7 +108,7 @@ end
     @test Functions.precision_at_fixed_recall(yhat, y, "X"; recall_threshold=0.9)==0
     @test Functions.precision_at_fixed_recall(yhat, y, "X"; recall_threshold=1)==0
 
-    # comparing with hand calculation, example one
+    # comparing with hand calculation, example two
     y = ["X", "O", "X", "X", "O", "X", "X", "O", "O", "X"]
     recalls, precisions, thresholds = Functions.precision_recall_curve(yhat, y,"X")
     # recalls =    [0.00, 0.167, 0.167, 0.333, 0.500, 0.833, 1.00,  1.00,  1.00]

@@ -374,7 +374,7 @@ function precision_at_fixed_recall(
     n = length(recalls)
     r = recalls[i1]
 
-    # intialize sum of precions:
+    # initialize sum of precisions:
     p = precisions[i1]
 
     i = i1 + 1
