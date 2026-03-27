@@ -36,12 +36,12 @@ MacroTools = "0.5"
 OrderedCollections = "1"
 PrecompileTools = "1.1"
 REPL = "1"
+ScientificTypes = "3.2.0"
 ScientificTypesBase = "3"
 StatisticalMeasuresBase = "0.1"
 Statistics = "1"
 StatsBase = "0.33, 0.34"
 julia = "1.10"
-
 [extras]
 LossFunctions = "30fc2ffe-d236-52d8-8643-a9d8f7c094a7"
 MLUtils = "f1d291b0-491e-4a28-83b9-f70985020b54"
