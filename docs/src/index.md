@@ -32,6 +32,9 @@ In addition to the measures themselves, this package provides:
 
 - A tool [`roc_curve`](@ref) for plotting Receiver Operator Characteristics
 
+- A tool [`precision_recall_curve`](@ref) for plotting precision-recall curves (more
+  informative alternative to `roc_curve` for unbalanced data)
+
 - An extension module allowing measures from
   [LossFunctions.jl](https://github.com/JuliaML/LossFunctions.jl) to be used and extended
   using the same syntax as other measures. See [Using losses from LossFunctions.jl](@ref).
