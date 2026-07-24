@@ -65,6 +65,13 @@ end
     area_deltas = precisions[1:(end -1)] .* recall_deltas
     area = sum(area_deltas)
     @test Functions.average_precision(ŷ2, y, "1") ≈ area
+
+    # edge case: only one recall/precision
+    # (https://github.com/JuliaAI/StatisticalMeasures.jl/issues/97)
+    ŷ3 = fill(0.123, length(y))
+    recalls, precisions, thresholds = Functions.precision_recall_curve(ŷ3, y, "1")
+    @test thresholds == [0.123,]
+    @test Functions.average_precision(ŷ3, y, "1") == 0.0
 end
 
 @testset "AUC" begin
