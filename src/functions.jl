@@ -307,6 +307,11 @@ In some other implementations, such as
 for unit recall, in the case the predicted positive class probabilities exclude `1.0`, and
 this is avoided here.
 
+## Edge-case exception
+
+If every predicted probability is the same (``k=1'') then the returned average precision
+is zero.
+
 """
 
 """
@@ -323,10 +328,13 @@ $DOC_AVERAGE_PRECISION
 $DOC_CONFUSION_CHECK Method requires at least one observation, but this is not checked.
 
 """
-function average_precision(ŷ, y, positive_class)
+function average_precision(ŷ::AbstractArray{<:T}, y, positive_class) where T
 
     recalls, precisions, _ = precision_recall_curve(ŷ, y, positive_class)
-    area = 0.0
+    area = zero(T)
+
+    # if ŷ is constant, return zero;;;;;
+    length(recalls) ≤ 2 && return area
 
     # `recalls` will have length at least two:
     length(recalls) > 2 || return 1.0
