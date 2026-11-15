@@ -104,6 +104,32 @@ end
     @test kappa(ŷ_m, y_m) ≈ CM.kappa(CM.confmat(ŷ_m, y_m))
 end
 
+@testset "rand index" begin
+    y = categorical([1, 1, 1, 2, 2, 2, 3, 3, 3, 3])
+    ŷ = categorical([1, 1, 1, 1, 2, 2, 2, 2, 2, 2])
+    relabeled_y = categorical([3, 3, 3, 2, 2, 2, 1, 1, 1, 1])
+
+    @test rand_index(y, y) == 1.0
+    @test rand_index(relabeled_y, y) == 1.0
+    @test rand_index(ŷ, y) ≈ 0.7111111111111111
+    @test rand_index(ŷ, y) == RandIndex()(ŷ, y)
+    @test rand_index(ŷ, y) == rand_index(y, ŷ)
+
+    y_with_missing = [y; missing]
+    ŷ_with_missing = [missing; ŷ]
+    @test rand_index(ŷ_with_missing, y_with_missing) ≈
+        rand_index(ŷ[1:end - 1], y[2:end])
+
+    @test API.consumes_multiple_observations(rand_index)
+    @test API.kind_of_proxy(rand_index) == StatisticalMeasures.LearnAPI.LabelAmbiguous()
+    @test API.observation_scitype(rand_index) <: Union{Missing,Finite}
+    @test !API.supports_weights(rand_index)
+    @test !API.supports_class_weights(rand_index)
+    @test_throws ArgumentError rand_index(ŷ, y, ones(length(y)))
+    @test API.orientation(rand_index) == API.Score()
+    @test API.human_name(rand_index) == "Rand index"
+end
+
 @testset "fscore" begin
     # core functionality tested in /test/functions.jl
 

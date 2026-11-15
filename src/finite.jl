@@ -389,6 +389,64 @@ Kappa
 "$KappaDoc"
 const kappa = Kappa()
 
+# ---------------------------------------------------
+# RandIndex
+
+struct _RandIndex end
+
+function (::_RandIndex)(yhat, y)
+    pair_count(count) = count * (count - 1.0) / 2
+
+    yhat, y = API.skipinvalid(yhat, y; skipnan=false)
+
+    total_pairs = pair_count(length(y))
+    same_yhat = sum(pair_count, values(countmap(yhat)); init=0.0)
+    same_y = sum(pair_count, values(countmap(y)); init=0.0)
+    same_both = sum(pair_count, values(countmap(zip(yhat, y))); init=0.0)
+
+    return (total_pairs - same_yhat - same_y + 2same_both) / total_pairs
+end
+
+RandIndex() = API.fussy_measure(API.robust_measure(_RandIndex()))
+
+const RandIndexType = API.FussyMeasure{<:API.RobustMeasure{<:_RandIndex}}
+
+# Cluster labels in `yhat` and `y` have independent categorical pools.
+function API.call(measure::RandIndexType, yhat, y, weight_args...)
+    API.check_numobs(yhat, y)
+    API.check_weight_support(measure, weight_args...)
+    return getfield(measure, :atom)(yhat, y, weight_args...)
+end
+
+@trait(
+    _RandIndex,
+    consumes_multiple_observations=true,
+    kind_of_proxy=LearnAPI.LabelAmbiguous(),
+    observation_scitype=Union{Missing,Finite},
+    orientation=Score(),
+    human_name="Rand index",
+)
+
+@fix_show RandIndex::RandIndexType
+
+register(RandIndex, "rand_index")
+
+const RandIndexDoc = docstring(
+    "RandIndex()",
+    scitype=DOC_FINITE,
+    body=
+"""
+Compute the proportion of pairs of observations on which two clusterings agree. Two
+clusterings agree on a pair when both assign its observations to the same cluster or both
+assign them to different clusters. The result is invariant to cluster relabeling.
+""",
+)
+
+"$RandIndexDoc"
+RandIndex
+"$RandIndexDoc"
+const rand_index = RandIndex()
+
 # ------------------------------------------------------------------
 # MatthewsCorrelation
 
